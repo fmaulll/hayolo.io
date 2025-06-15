@@ -708,31 +708,83 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
           {questions.length === 0 ? (
             <div className="text-gray-500">No questions to preview.</div>
           ) : (
-            <div>
-              <div className="mb-2 text-sm text-gray-600">Question {previewIndex + 1} of {questions.length}</div>
-              <div className="font-medium text-lg mb-2 text-black">{questions[previewIndex].question_text || <span className="text-gray-400">(No question text)</span>}</div>
-              {questions[previewIndex].image_url && (
-                <img src={questions[previewIndex].image_url} alt="Preview" className="mb-2 max-h-40 rounded border border-black" />
-              )}
-              <div className="mb-2">
-                {questions[previewIndex].question_type === 'multiple_choice' && questions[previewIndex].options && (
-                  <ul className="space-y-2">
-                    {questions[previewIndex].options.map((opt, i) => (
-                      <li key={i} className={`px-3 py-2 border rounded text-black ${opt.is_correct ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}>{opt.option_text}</li>
-                    ))}
-                  </ul>
-                )}
-                {questions[previewIndex].question_type === 'yes_no' && (
-                  <div className="space-x-4">
-                    <span className="px-3 py-2 border rounded border-gray-300">Yes</span>
-                    <span className="px-3 py-2 border rounded border-gray-300">No</span>
+            <div className="flex flex-col border-2 border-black rounded-lg overflow-hidden">
+              {/* Browser Header */}
+              <div className="bg-gray-100 border-b-2 border-black p-2 flex items-center gap-2">
+                {/* Navigation Buttons */}
+                <div className="flex gap-1">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                </div>
+                
+                {/* URL Bar */}
+                <div className="flex-1 bg-white border-2 border-black rounded-md px-3 py-1 flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4" />
+                  </svg>
+                  <span className="text-sm text-gray-600 truncate">quiz.example.com/question/{previewIndex + 1}</span>
+                </div>
+              </div>
+
+              {/* Browser Content */}
+              <div className="flex flex-col items-center p-6 bg-white">
+                <div className="mb-2 text-sm text-gray-600">Question {previewIndex + 1} of {questions.length}</div>
+                
+                {/* Question Text */}
+                <div className="font-medium text-2xl mb-4 text-center text-black w-full">
+                  {questions[previewIndex].question_text || <span className="text-gray-400">(No question text)</span>}
+                </div>
+
+                {/* Image Section */}
+                {questions[previewIndex].image_url && (
+                  <div className="w-full mb-6 flex justify-center">
+                    <img 
+                      src={questions[previewIndex].image_url} 
+                      alt="Preview" 
+                      className="max-h-48 rounded-lg border-2 border-black object-contain"
+                    />
                   </div>
                 )}
-                {questions[previewIndex].question_type === 'short_answer' && (
-                  <div className="italic text-gray-500">Short answer expected</div>
-                )}
+
+                {/* Options Section */}
+                <div className="w-full">
+                  {questions[previewIndex].question_type === 'multiple_choice' && questions[previewIndex].options && (
+                    <div className="grid grid-cols-2 gap-4">
+                      {questions[previewIndex].options.map((opt, i) => (
+                        <div 
+                          key={i} 
+                          className={`p-4 rounded-lg border-2 text-center text-lg font-medium transition-colors
+                            ${opt.is_correct 
+                              ? 'border-green-500 bg-green-50 text-green-700' 
+                              : 'border-gray-300 hover:border-gray-400 text-black'}`}
+                        >
+                          {opt.option_text}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {questions[previewIndex].question_type === 'yes_no' && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 rounded-lg border-2 border-gray-300 text-center text-lg font-medium hover:border-gray-400">
+                        Yes
+                      </div>
+                      <div className="p-4 rounded-lg border-2 border-gray-300 text-center text-lg font-medium hover:border-gray-400">
+                        No
+                      </div>
+                    </div>
+                  )}
+
+                  {questions[previewIndex].question_type === 'short_answer' && (
+                    <div className="p-4 rounded-lg border-2 border-gray-300 text-center text-lg font-medium">
+                      <span className="text-gray-500">Type your answer here...</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4 text-sm text-gray-500">Points: {questions[previewIndex].points}</div>
               </div>
-              <div className="text-xs text-gray-400">Points: {questions[previewIndex].points}</div>
             </div>
           )}
         </div>
