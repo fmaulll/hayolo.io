@@ -103,29 +103,26 @@ export default function Login() {
   }
 
   return (
-    <main className="min-h-screen bg-white flex items-center justify-center p-4"> {/* Changed background gradient to solid white */}
+    <main className="min-h-screen bg-white flex items-center justify-center p-4 font-oswald">
       <div className="w-full max-w-md">
         <Link 
           href="/"
-          className="flex items-center justify-center gap-2 text-black font-bold text-xl mb-8 hover:text-gray-800 transition-colors" /* Redesigned logo link */
+          className="flex items-center justify-center gap-2 text-black font-extrabold text-4xl mb-8 hover:text-gray-800 transition-colors font-oswald"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-          </svg>
-          QuestionBoard
+          hayolo.io
         </Link>
 
-        <div className="bg-white p-8 rounded-none shadow-lg border-2 border-black"> {/* Redesigned card container */}
-          <h1 className="text-2xl font-bold text-black mb-2 text-center">Welcome Back</h1> {/* Redesigned text */}
-          <p className="text-gray-700 text-center mb-8">Sign in to your account to continue</p> {/* Redesigned text */}
+        <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-black font-oswald">
+          <h1 className="text-2xl font-extrabold text-black mb-2 text-center font-oswald">Welcome Back</h1>
+          <p className="text-gray-700 text-center mb-8 font-oswald">Sign in to your account to continue</p>
           
           {/* Google Sign In Button */}
           <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-black rounded-none text-black bg-white hover:bg-gray-100 transition-all duration-200 mb-6 shadow-sm" /* Redesigned button */
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-black rounded-lg text-black bg-white hover:bg-gray-100 transition-all duration-200 mb-6 shadow-sm font-oswald"
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24"> {/* Google icon SVG - kept color for brand recognition */}
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 fill="#4285F4"
@@ -148,16 +145,16 @@ export default function Login() {
 
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t-2 border-black border-dashed"></div> {/* Redesigned divider */}
+              <div className="w-full border-t-2 border-black border-dashed"></div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-700">Or continue with email</span> {/* Redesigned text */}
+            <div className="relative flex justify-center text-sm font-oswald">
+              <span className="px-2 bg-white text-gray-700">Or continue with email</span>
             </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4 font-oswald">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-black mb-1"> {/* Redesigned text */}
+              <label htmlFor="email" className="block text-sm font-bold text-black mb-1 font-oswald">
                 Email
               </label>
               <input
@@ -165,13 +162,13 @@ export default function Login() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 bg-white border-2 border-black rounded-none text-black focus:outline-none focus:ring-0 focus:border-black transition-all shadow-sm" /* Redesigned input */
+                className="w-full px-4 py-2 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:ring-0 focus:border-black transition-all shadow-sm font-oswald"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-black mb-1"> {/* Redesigned text */}
+              <label htmlFor="password" className="block text-sm font-bold text-black mb-1 font-oswald">
                 Password
               </label>
               <input
@@ -179,7 +176,7 @@ export default function Login() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-white border-2 border-black rounded-none text-black focus:outline-none focus:ring-0 focus:border-black transition-all shadow-sm" /* Redesigned input */
+                className="w-full px-4 py-2 bg-white border-2 border-black rounded-lg text-black focus:outline-none focus:ring-0 focus:border-black transition-all shadow-sm font-oswald"
                 required
               />
             </div>
@@ -187,31 +184,25 @@ export default function Login() {
             {error && (
               <div className={
                 error.includes('Check your email')
-                  ? 'text-green-600 bg-green-50 border border-green-600 p-2 rounded-none text-sm text-center mt-4'
-                  : 'text-red-600 bg-red-50 border border-red-600 p-2 rounded-none text-sm text-center mt-4'
+                  ? 'text-green-600 bg-green-50 border border-green-600 p-2 rounded-lg text-sm text-center mt-4 font-oswald'
+                  : 'text-red-600 bg-red-50 border border-red-600 p-2 rounded-lg text-sm text-center mt-4 font-oswald'
                 } role="alert">
                 <div className="flex items-center justify-center gap-2">
-                    <AlertCircle className="w-4 h-4" /> {/* Lucide AlertCircle */}
+                    <AlertCircle className="w-4 h-4" />
                     <span>{error}</span>
                 </div>
               </div>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-2"> {/* Stack buttons on mobile */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-2 font-oswald">
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`
-                  flex-1 w-full sm:w-auto bg-black text-white px-4 py-2 rounded-none
-                  font-medium text-sm
-                  hover:bg-gray-800 transition-all border border-black
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  flex items-center justify-center gap-2 shadow-md
-                `} /* Redesigned primary button */
+                className="flex-1 w-full sm:w-auto bg-[#FFD34E] text-black px-4 py-2 rounded-lg font-bold text-sm hover:bg-yellow-500 transition-all border-2 border-black disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md font-oswald"
               >
                 {isLoading ? (
                   <>
-                    <Loader2 className="animate-spin h-4 w-4" /> {/* Lucide Loader2 */}
+                    <Loader2 className="animate-spin h-4 w-4" />
                     Processing...
                   </>
                 ) : (
@@ -223,13 +214,7 @@ export default function Login() {
                 type="button"
                 onClick={handleSignUp}
                 disabled={isLoading}
-                className={`
-                  flex-1 w-full sm:w-auto bg-white text-black px-4 py-2 rounded-none
-                  font-medium text-sm border-2 border-black
-                  hover:bg-gray-100 transition-all shadow-sm
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  flex items-center justify-center gap-2
-                `} /* Redesigned secondary button */
+                className="flex-1 w-full sm:w-auto bg-white text-black px-4 py-2 rounded-lg font-bold text-sm border-2 border-black hover:bg-gray-100 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-oswald"
               >
                 Sign Up
               </button>
@@ -237,13 +222,13 @@ export default function Login() {
           </form>
         </div>
 
-        <p className="mt-8 text-center text-sm text-gray-700"> {/* Redesigned text */}
+        <p className="mt-8 text-center text-sm text-gray-700 font-oswald">
           By signing in, you agree to our{' '}
-          <Link href="/terms" className="font-medium text-black hover:text-gray-800 transition-colors"> {/* Redesigned links */}
+          <Link href="/terms" className="font-bold text-black hover:text-gray-800 transition-colors font-oswald">
             Terms of Service
           </Link>{' '}
           and{' '}
-          <Link href="/privacy" className="font-medium text-black hover:text-gray-800 transition-colors"> {/* Redesigned links */}
+          <Link href="/privacy" className="font-bold text-black hover:text-gray-800 transition-colors font-oswald">
             Privacy Policy
           </Link>
         </p>
