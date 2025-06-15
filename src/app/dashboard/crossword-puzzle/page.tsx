@@ -59,7 +59,7 @@ export default function CreateCrosswordPage() {
   const [crosswordToDelete, setCrosswordToDelete] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCrosswords, setTotalCrosswords] = useState(0);
-  const ITEMS_PER_PAGE = 3;
+  const ITEMS_PER_PAGE = 4;
 
   const fetchCrosswords = async () => {
     setIsFetchingCrosswords(true);
@@ -184,341 +184,340 @@ export default function CreateCrosswordPage() {
     setEditingId(crossword.id);
     document.getElementById('puzzle-info')?.scrollIntoView({ behavior: 'smooth' });
   };
-// ... (your existing imports and interfaces)
 
-const generateAndSavePuzzle = async () => {
-  const validEntries = entries.filter(entry => entry.question.trim() && entry.answer.trim());
-  if (validEntries.length < 2) {
-    alert('Please add at least 2 complete question-answer pairs to create a crossword.');
-    return;
-  }
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
-    router.push('/login');
-    return;
-  }
-
-  setIsLoading(true);
-  try {
-    // --- DYNAMIC GRID SIZE CALCULATION ---
-    // 1. Find the length of the longest answer
-    const longestAnswerLength = validEntries.reduce((max, entry) =>
-      Math.max(max, entry.answer.trim().length), 0
-    );
-
-    // 2. Determine base grid size (at least 15)
-    let dynamicGridSize = Math.max(15, longestAnswerLength + 2); // +2 for padding on sides
-                                                              // You might need more padding depending on your specific algorithm's needs.
-                                                              // E.g., if words can start near the edge.
-
-    // 3. Ensure a reasonable maximum to prevent excessively large grids
-    if (dynamicGridSize > 30) { // Set a practical upper limit, e.g., 30x30
-        dynamicGridSize = 30;
-        toast.error("Puzzle grid size adjusted to max 30x30 for performance.");
+  const generateAndSavePuzzle = async () => {
+    const validEntries = entries.filter(entry => entry.question.trim() && entry.answer.trim());
+    if (validEntries.length < 2) {
+      alert('Please add at least 2 complete question-answer pairs to create a crossword.');
+      return;
     }
 
-    const gridSize = dynamicGridSize; // Use the dynamically calculated size from here on
-
-    // --- GRID INITIALIZATION (using the calculated gridSize) ---
-    const grid: GridCell[][] = Array(gridSize).fill(null).map(() =>
-      Array(gridSize).fill(null).map(() => ({
-        letter: '',
-        isBlack: true,
-        belongsToWords: [],
-        number: undefined
-      }))
-    );
-
-    const placedWords: PlacedWord[] = [];
-    let currentNumber = 1;
-    // Sort words by length descending to prioritize placing longer words first
-    // This often leads to better puzzle generation success rates.
-    let unplacedWords = [...validEntries].sort((a, b) => b.answer.length - a.answer.length);
-
-    // --- PLACE FIRST WORD (Now based on the longest word) ---
-    // Use the *actual* longest word from sorted unplacedWords as the first one
-    const firstEntry = unplacedWords.shift(); // Remove the first (longest) word
-    if (!firstEntry) { // Should not happen if validEntries.length >= 2
-        throw new Error("No valid first entry to place.");
-    }
-    const firstWord = firstEntry.answer.toUpperCase();
-
-    // Place first word roughly in the center, accounting for its length
-    const startRow = Math.floor(gridSize / 2);
-    const startCol = Math.floor((gridSize - firstWord.length) / 2);
-
-    placedWords.push({
-      word: firstWord,
-      question: firstEntry.question,
-      row: startRow,
-      col: startCol,
-      direction: 'horizontal',
-      number: currentNumber
-    });
-
-    for (let i = 0; i < firstWord.length; i++) {
-      grid[startRow][startCol + i] = {
-        letter: firstWord[i],
-        isBlack: false,
-        number: i === 0 ? currentNumber : undefined,
-        belongsToWords: [currentNumber]
-      };
-    }
-    currentNumber++; // Increment after placing the first word
-
-    // --- TRY TO PLACE REMAINING WORDS (Adjusted for dynamic sizing and robustness) ---
-    let maxAttempts = 100; // Increased attempts for potentially larger grids/more words
-    let iterationAttempts = 0; // Attempts for the current iteration of placing words
-    let lastUnplacedCount = unplacedWords.length + 1; // To detect if no words were placed in an iteration
-
-    // Keep trying to place words until all are placed or max attempts reached
-    while (unplacedWords.length > 0 && iterationAttempts < maxAttempts) {
-        iterationAttempts++;
-
-        let wordsPlacedInThisIteration = false;
-        // Shuffle unplaced words to introduce randomness and try different orders
-        unplacedWords.sort(() => Math.random() - 0.5);
-
-        for (let i = 0; i < unplacedWords.length; i++) {
-            const currentWordEntry = unplacedWords[i];
-            const currentWord = currentWordEntry.answer.toUpperCase();
-            let bestPlacement: PlacedWord | null = null;
-            let bestScore = -1;
-
-            for (const placedExistingWord of placedWords) {
-                for (let placedCharIndex = 0; placedCharIndex < placedExistingWord.word.length; placedCharIndex++) {
-                    for (let currentCharIndex = 0; currentCharIndex < currentWord.length; currentCharIndex++) {
-                        if (placedExistingWord.word[placedCharIndex] === currentWord[currentCharIndex]) {
-                            const newDirection = placedExistingWord.direction === 'horizontal' ? 'vertical' : 'horizontal';
-
-                            let newRow, newCol;
-                            if (newDirection === 'horizontal') {
-                                newRow = placedExistingWord.row + (placedExistingWord.direction === 'vertical' ? placedCharIndex : 0);
-                                newCol = placedExistingWord.col - currentCharIndex + (placedExistingWord.direction === 'horizontal' ? placedCharIndex : 0);
-                            } else { // newDirection === 'vertical'
-                                newRow = placedExistingWord.row - currentCharIndex + (placedExistingWord.direction === 'vertical' ? placedCharIndex : 0);
-                                newCol = placedExistingWord.col + (placedExistingWord.direction === 'horizontal' ? placedCharIndex : 0);
-                            }
-
-                            // Check placement validity
-                            if (isValidPlacement(grid, currentWord, newRow, newCol, newDirection, gridSize)) {
-                                const score = calculatePlacementScore(grid, currentWord, newRow, newCol, newDirection);
-                                if (score > bestScore) {
-                                    bestScore = score;
-                                    bestPlacement = {
-                                        word: currentWord,
-                                        question: currentWordEntry.question,
-                                        row: newRow,
-                                        col: newCol,
-                                        direction: newDirection,
-                                        number: 0 // Temporary
-                                    };
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (bestPlacement) {
-                // Assign a number (this needs to be unique and managed)
-                while (placedWords.some(w => w.number === currentNumber)) {
-                    currentNumber++;
-                }
-                bestPlacement.number = currentNumber;
-
-                // Temporarily place to see if it allows other words to be placed better
-                // For a more advanced algorithm, you'd implement full backtracking here.
-                // For simplicity here, we commit immediately.
-                placedWords.push(bestPlacement);
-                placeWordInGrid(grid, bestPlacement);
-                currentNumber++;
-                
-                // Remove the successfully placed word from unplacedWords
-                unplacedWords.splice(i, 1);
-                i--; // Adjust index since we removed an item
-                wordsPlacedInThisIteration = true;
-            }
-        }
-
-        // If no words were placed in this entire iteration (and unplaced words still exist),
-        // or if we're stuck (unplacedCount hasn't changed), try a different approach (re-shuffling, etc.)
-        if (!wordsPlacedInThisIteration && unplacedWords.length > 0) {
-            // This indicates a difficult placement scenario.
-            // Reset and retry from scratch with a different initial configuration.
-            // This is a simple form of "backtracking" for a fixed number of attempts.
-            // A more sophisticated algorithm would selectively backtrack last placement.
-
-            if (iterationAttempts < maxAttempts - 1) { // Only reset if we still have attempts left
-                 // Reset grid, placed words, and unplaced words
-                for (let row = 0; row < gridSize; row++) {
-                    for (let col = 0; col < gridSize; col++) {
-                        grid[row][col] = {
-                            letter: '',
-                            isBlack: true,
-                            belongsToWords: [],
-                            number: undefined
-                        };
-                    }
-                }
-                placedWords.length = 0; // Clear array
-                currentNumber = 1;
-                unplacedWords = [...validEntries].sort((a, b) => Math.random() - 0.5); // Reshuffle all entries
-
-                // Place a new first word (e.g., the new longest or a random one)
-                const newFirstEntry = unplacedWords.shift();
-                if (newFirstEntry) {
-                    const newFirstWord = newFirstEntry.answer.toUpperCase();
-                    const newStartRow = Math.floor(gridSize / 2); // Or randomly pick starting point
-                    const newStartCol = Math.floor((gridSize - newFirstWord.length) / 2);
-
-                    placedWords.push({
-                        word: newFirstWord,
-                        question: newFirstEntry.question,
-                        row: newStartRow,
-                        col: newStartCol,
-                        direction: 'horizontal', // Could also randomize direction
-                        number: currentNumber
-                    });
-
-                    for (let i = 0; i < newFirstWord.length; i++) {
-                        grid[newStartRow][newStartCol + i] = {
-                            letter: newFirstWord[i],
-                            isBlack: false,
-                            number: i === 0 ? currentNumber : undefined,
-                            belongsToWords: [currentNumber]
-                        };
-                    }
-                    currentNumber++;
-                    iterationAttempts = 0; // Reset attempts for this new configuration
-                } else {
-                    // This means unplacedWords became empty after a previous shift, which is good
-                    break;
-                }
-            }
-        }
-        lastUnplacedCount = unplacedWords.length;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      router.push('/login');
+      return;
     }
 
-    // --- FINAL VALIDATION AND NUMBERING ---
-    if (unplacedWords.length > 0) {
-      throw new Error(`Could not place all words in the grid after ${maxAttempts} attempts. Unplaced words: ${unplacedWords.map(w => w.answer).join(', ')}`);
-    }
+    setIsLoading(true);
+    try {
+      // --- DYNAMIC GRID SIZE CALCULATION ---
+      // 1. Find the length of the longest answer
+      const longestAnswerLength = validEntries.reduce((max, entry) =>
+        Math.max(max, entry.answer.trim().length), 0
+      );
 
-    const finalPlacedWords: PlacedWord[] = [];
-    const usedNumbers = new Set<number>();
-    currentNumber = 1;
+      // 2. Determine base grid size (at least 15)
+      let dynamicGridSize = Math.max(15, longestAnswerLength + 2); // +2 for padding on sides
+                                                                // You might need more padding depending on your specific algorithm's needs.
+                                                                // E.g., if words can start near the edge.
 
-    // Reset all numbers in the grid cells first
-    for (let row = 0; row < gridSize; row++) {
-        for (let col = 0; col < gridSize; col++) {
-            if (grid[row][col] && !grid[row][col].isBlack) { // Ensure cell exists and is not black
-                grid[row][col].number = undefined;
-            }
-        }
-    }
+      // 3. Ensure a reasonable maximum to prevent excessively large grids
+      if (dynamicGridSize > 30) { // Set a practical upper limit, e.g., 30x30
+          dynamicGridSize = 30;
+          toast.error("Puzzle grid size adjusted to max 30x30 for performance.");
+      }
 
-    // Assign final numbers based on the earliest starting position of each placed word
-    // Sort placed words by their position to assign numbers consistently (top-to-bottom, left-to-right)
-    placedWords.sort((a, b) => {
-        if (a.row !== b.row) return a.row - b.row;
-        return a.col - b.col;
-    });
+      const gridSize = dynamicGridSize; // Use the dynamically calculated size from here on
 
-    // Re-number and update belongsToWords based on final numbering
-    placedWords.forEach(word => {
-        const { row, col } = word;
+      // --- GRID INITIALIZATION (using the calculated gridSize) ---
+      const grid: GridCell[][] = Array(gridSize).fill(null).map(() =>
+        Array(gridSize).fill(null).map(() => ({
+          letter: '',
+          isBlack: true,
+          belongsToWords: [],
+          number: undefined
+        }))
+      );
 
-        // Assign new sequential number
-        const assignedNumber = currentNumber;
-        currentNumber++;
+      const placedWords: PlacedWord[] = [];
+      let currentNumber = 1;
+      // Sort words by length descending to prioritize placing longer words first
+      // This often leads to better puzzle generation success rates.
+      let unplacedWords = [...validEntries].sort((a, b) => b.answer.length - a.answer.length);
 
-        // Update the grid cell at the start of the word
-        if (grid[row][col]) { // Ensure cell exists
-            grid[row][col].number = assignedNumber;
-        }
+      // --- PLACE FIRST WORD (Now based on the longest word) ---
+      // Use the *actual* longest word from sorted unplacedWords as the first one
+      const firstEntry = unplacedWords.shift(); // Remove the first (longest) word
+      if (!firstEntry) { // Should not happen if validEntries.length >= 2
+          throw new Error("No valid first entry to place.");
+      }
+      const firstWord = firstEntry.answer.toUpperCase();
 
-        // Create the final PlacedWord object with the assigned number
-        finalPlacedWords.push({
-            ...word,
-            number: assignedNumber
-        });
+      // Place first word roughly in the center, accounting for its length
+      const startRow = Math.floor(gridSize / 2);
+      const startCol = Math.floor((gridSize - firstWord.length) / 2);
 
-        // Update belongsToWords for all cells occupied by this word with the new number
-        for (let i = 0; i < word.word.length; i++) {
-            const r = word.direction === 'horizontal' ? row : row + i;
-            const c = word.direction === 'horizontal' ? col + i : col;
-            if (grid[r][c]) { // Ensure cell exists
-                // Filter out old numbers and add the new one
-                grid[r][c].belongsToWords = grid[r][c].belongsToWords
-                    .filter(n => n !== word.number) // Remove old temp number if any
-                    .concat(assignedNumber)
-                    .filter((value, index, self) => self.indexOf(value) === index); // Ensure uniqueness
-            }
-        }
-    });
+      placedWords.push({
+        word: firstWord,
+        question: firstEntry.question,
+        row: startRow,
+        col: startCol,
+        direction: 'horizontal',
+        number: currentNumber
+      });
 
-    // Sort finalPlacedWords by number for consistent display in clues
-    finalPlacedWords.sort((a, b) => a.number - b.number);
+      for (let i = 0; i < firstWord.length; i++) {
+        grid[startRow][startCol + i] = {
+          letter: firstWord[i],
+          isBlack: false,
+          number: i === 0 ? currentNumber : undefined,
+          belongsToWords: [currentNumber]
+        };
+      }
+      currentNumber++; // Increment after placing the first word
+
+      // --- TRY TO PLACE REMAINING WORDS (Adjusted for dynamic sizing and robustness) ---
+      let maxAttempts = 100; // Increased attempts for potentially larger grids/more words
+      let iterationAttempts = 0; // Attempts for the current iteration of placing words
+      let lastUnplacedCount = unplacedWords.length + 1; // To detect if no words were placed in an iteration
+
+      // Keep trying to place words until all are placed or max attempts reached
+      while (unplacedWords.length > 0 && iterationAttempts < maxAttempts) {
+          iterationAttempts++;
+
+          let wordsPlacedInThisIteration = false;
+          // Shuffle unplaced words to introduce randomness and try different orders
+          unplacedWords.sort(() => Math.random() - 0.5);
+
+          for (let i = 0; i < unplacedWords.length; i++) {
+              const currentWordEntry = unplacedWords[i];
+              const currentWord = currentWordEntry.answer.toUpperCase();
+              let bestPlacement: PlacedWord | null = null;
+              let bestScore = -1;
+
+              for (const placedExistingWord of placedWords) {
+                  for (let placedCharIndex = 0; placedCharIndex < placedExistingWord.word.length; placedCharIndex++) {
+                      for (let currentCharIndex = 0; currentCharIndex < currentWord.length; currentCharIndex++) {
+                          if (placedExistingWord.word[placedCharIndex] === currentWord[currentCharIndex]) {
+                              const newDirection = placedExistingWord.direction === 'horizontal' ? 'vertical' : 'horizontal';
+
+                              let newRow, newCol;
+                              if (newDirection === 'horizontal') {
+                                  newRow = placedExistingWord.row + (placedExistingWord.direction === 'vertical' ? placedCharIndex : 0);
+                                  newCol = placedExistingWord.col - currentCharIndex + (placedExistingWord.direction === 'horizontal' ? placedCharIndex : 0);
+                              } else { // newDirection === 'vertical'
+                                  newRow = placedExistingWord.row - currentCharIndex + (placedExistingWord.direction === 'vertical' ? placedCharIndex : 0);
+                                  newCol = placedExistingWord.col + (placedExistingWord.direction === 'horizontal' ? placedCharIndex : 0);
+                              }
+
+                              // Check placement validity
+                              if (isValidPlacement(grid, currentWord, newRow, newCol, newDirection, gridSize)) {
+                                  const score = calculatePlacementScore(grid, currentWord, newRow, newCol, newDirection);
+                                  if (score > bestScore) {
+                                      bestScore = score;
+                                      bestPlacement = {
+                                          word: currentWord,
+                                          question: currentWordEntry.question,
+                                          row: newRow,
+                                          col: newCol,
+                                          direction: newDirection,
+                                          number: 0 // Temporary
+                                      };
+                                  }
+                              }
+                          }
+                      }
+                  }
+              }
+
+              if (bestPlacement) {
+                  // Assign a number (this needs to be unique and managed)
+                  while (placedWords.some(w => w.number === currentNumber)) {
+                      currentNumber++;
+                  }
+                  bestPlacement.number = currentNumber;
+
+                  // Temporarily place to see if it allows other words to be placed better
+                  // For a more advanced algorithm, you'd implement full backtracking here.
+                  // For simplicity here, we commit immediately.
+                  placedWords.push(bestPlacement);
+                  placeWordInGrid(grid, bestPlacement);
+                  currentNumber++;
+                  
+                  // Remove the successfully placed word from unplacedWords
+                  unplacedWords.splice(i, 1);
+                  i--; // Adjust index since we removed an item
+                  wordsPlacedInThisIteration = true;
+              }
+          }
+
+          // If no words were placed in this entire iteration (and unplaced words still exist),
+          // or if we're stuck (unplacedCount hasn't changed), try a different approach (re-shuffling, etc.)
+          if (!wordsPlacedInThisIteration && unplacedWords.length > 0) {
+              // This indicates a difficult placement scenario.
+              // Reset and retry from scratch with a different initial configuration.
+              // This is a simple form of "backtracking" for a fixed number of attempts.
+              // A more sophisticated algorithm would selectively backtrack last placement.
+
+              if (iterationAttempts < maxAttempts - 1) { // Only reset if we still have attempts left
+                   // Reset grid, placed words, and unplaced words
+                  for (let row = 0; row < gridSize; row++) {
+                      for (let col = 0; col < gridSize; col++) {
+                          grid[row][col] = {
+                              letter: '',
+                              isBlack: true,
+                              belongsToWords: [],
+                              number: undefined
+                          };
+                      }
+                  }
+                  placedWords.length = 0; // Clear array
+                  currentNumber = 1;
+                  unplacedWords = [...validEntries].sort((a, b) => Math.random() - 0.5); // Reshuffle all entries
+
+                  // Place a new first word (e.g., the new longest or a random one)
+                  const newFirstEntry = unplacedWords.shift();
+                  if (newFirstEntry) {
+                      const newFirstWord = newFirstEntry.answer.toUpperCase();
+                      const newStartRow = Math.floor(gridSize / 2); // Or randomly pick starting point
+                      const newStartCol = Math.floor((gridSize - newFirstWord.length) / 2);
+
+                      placedWords.push({
+                          word: newFirstWord,
+                          question: newFirstEntry.question,
+                          row: newStartRow,
+                          col: newStartCol,
+                          direction: 'horizontal', // Could also randomize direction
+                          number: currentNumber
+                      });
+
+                      for (let i = 0; i < newFirstWord.length; i++) {
+                          grid[newStartRow][newStartCol + i] = {
+                              letter: newFirstWord[i],
+                              isBlack: false,
+                              number: i === 0 ? currentNumber : undefined,
+                              belongsToWords: [currentNumber]
+                          };
+                      }
+                      currentNumber++;
+                      iterationAttempts = 0; // Reset attempts for this new configuration
+                  } else {
+                      // This means unplacedWords became empty after a previous shift, which is good
+                      break;
+                  }
+              }
+          }
+          lastUnplacedCount = unplacedWords.length;
+      }
+
+      // --- FINAL VALIDATION AND NUMBERING ---
+      if (unplacedWords.length > 0) {
+        throw new Error(`Could not place all words in the grid after ${maxAttempts} attempts. Unplaced words: ${unplacedWords.map(w => w.answer).join(', ')}`);
+      }
+
+      const finalPlacedWords: PlacedWord[] = [];
+      const usedNumbers = new Set<number>();
+      currentNumber = 1;
+
+      // Reset all numbers in the grid cells first
+      for (let row = 0; row < gridSize; row++) {
+          for (let col = 0; col < gridSize; col++) {
+              if (grid[row][col] && !grid[row][col].isBlack) { // Ensure cell exists and is not black
+                  grid[row][col].number = undefined;
+              }
+          }
+      }
+
+      // Assign final numbers based on the earliest starting position of each placed word
+      // Sort placed words by their position to assign numbers consistently (top-to-bottom, left-to-right)
+      placedWords.sort((a, b) => {
+          if (a.row !== b.row) return a.row - b.row;
+          return a.col - b.col;
+      });
+
+      // Re-number and update belongsToWords based on final numbering
+      placedWords.forEach(word => {
+          const { row, col } = word;
+
+          // Assign new sequential number
+          const assignedNumber = currentNumber;
+          currentNumber++;
+
+          // Update the grid cell at the start of the word
+          if (grid[row][col]) { // Ensure cell exists
+              grid[row][col].number = assignedNumber;
+          }
+
+          // Create the final PlacedWord object with the assigned number
+          finalPlacedWords.push({
+              ...word,
+              number: assignedNumber
+          });
+
+          // Update belongsToWords for all cells occupied by this word with the new number
+          for (let i = 0; i < word.word.length; i++) {
+              const r = word.direction === 'horizontal' ? row : row + i;
+              const c = word.direction === 'horizontal' ? col + i : col;
+              if (grid[r][c]) { // Ensure cell exists
+                  // Filter out old numbers and add the new one
+                  grid[r][c].belongsToWords = grid[r][c].belongsToWords
+                      .filter(n => n !== word.number) // Remove old temp number if any
+                      .concat(assignedNumber)
+                      .filter((value, index, self) => self.indexOf(value) === index); // Ensure uniqueness
+              }
+          }
+      });
+
+      // Sort finalPlacedWords by number for consistent display in clues
+      finalPlacedWords.sort((a, b) => a.number - b.number);
 
 
-    // --- DATABASE SAVE / UPDATE ---
-    if (isEditing && editingId) {
-      const { error } = await supabase
-        .from('crosswords')
-        .update({
-          name: puzzleName || 'Untitled Puzzle',
-          entries: validEntries,
-          grid: grid, // Update grid for edited puzzles
-          placed_words: finalPlacedWords, // Update placed_words
-        })
-        .eq('id', editingId);
-
-      if (error) throw error;
-
-      toast.success('Puzzle updated successfully!');
-    }
-    else {
-      const { data, error } = await supabase
-        .from('crosswords')
-        .insert([
-          {
+      // --- DATABASE SAVE / UPDATE ---
+      if (isEditing && editingId) {
+        const { error } = await supabase
+          .from('crosswords')
+          .update({
             name: puzzleName || 'Untitled Puzzle',
             entries: validEntries,
-            grid: grid,
-            placed_words: finalPlacedWords,
-            created_at: new Date().toISOString(),
-            user_id: user.id
-          }
-        ])
-        .select('id')
-        .single();
+            grid: grid, // Update grid for edited puzzles
+            placed_words: finalPlacedWords, // Update placed_words
+          })
+          .eq('id', editingId);
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast.success('Puzzle created successfully!');
+        toast.success('Puzzle updated successfully!');
+      }
+      else {
+        const { data, error } = await supabase
+          .from('crosswords')
+          .insert([
+            {
+              name: puzzleName || 'Untitled Puzzle',
+              entries: validEntries,
+              grid: grid,
+              placed_words: finalPlacedWords,
+              created_at: new Date().toISOString(),
+              user_id: user.id
+            }
+          ])
+          .select('id')
+          .single();
+
+        if (error) throw error;
+
+        toast.success('Puzzle created successfully!');
+      }
+
+      // --- RESET UI AND REFETCH ---
+      setIsEditing(false);
+      setEditingId(null);
+      setPuzzleName('');
+      setEntries([{ question: '', answer: '' }]);
+      fetchCrosswords(); // Re-fetch list to show updated/new puzzle
+      document.getElementById('my-puzzles')?.scrollIntoView({ behavior: 'smooth' });
+
+    } catch (error) {
+      console.error('Error saving puzzle:', error);
+      toast.error(`Failed to save the puzzle: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    // --- RESET UI AND REFETCH ---
-    setIsEditing(false);
-    setEditingId(null);
-    setPuzzleName('');
-    setEntries([{ question: '', answer: '' }]);
-    fetchCrosswords(); // Re-fetch list to show updated/new puzzle
-    document.getElementById('my-puzzles')?.scrollIntoView({ behavior: 'smooth' });
-
-  } catch (error) {
-    console.error('Error saving puzzle:', error);
-    toast.error(`Failed to save the puzzle: ${error instanceof Error ? error.message : String(error)}`);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-// ... (your isValidPlacement, calculatePlacementScore, placeWordInGrid functions - these need to be robust)
-// Note: Ensure isValidPlacement and calculatePlacementScore handle grid boundaries correctly with the dynamic gridSize.
-// The provided isValidPlacement seems to include some boundary checks, but double-check them thoroughly.
+  // ... (your isValidPlacement, calculatePlacementScore, placeWordInGrid functions - these need to be robust)
+  // Note: Ensure isValidPlacement and calculatePlacementScore handle grid boundaries correctly with the dynamic gridSize.
+  // The provided isValidPlacement seems to include some boundary checks, but double-check them thoroughly.
 
   const isValidPlacement = (grid: any[][], word: string, row: number, col: number, direction: 'horizontal' | 'vertical', gridSize: number): boolean => {
     if (direction === 'horizontal') {
@@ -697,7 +696,7 @@ const generateAndSavePuzzle = async () => {
   const hasValidEntries = entries.some(entry => entry.question.trim() && entry.answer.trim());
 
   return (
-    <div className="container">
+    <>
       <ConfirmationModal
         isOpen={showDeleteModal}
         onClose={() => {
@@ -711,40 +710,34 @@ const generateAndSavePuzzle = async () => {
         cancelText="Cancel"
         type="danger"
       />
-
-      <div className="flex flex-col items-center justify-center mb-8">
-        <h1 className="text-4xl font-bold text-black mb-4 bg-white backdrop-blur-sm shadow-lg py-4 px-6 border-2 border-black">
-          Crossword Creator
-        </h1>
-        <p className="text-gray-600 text-lg bg-white backdrop-blur-sm shadow-lg py-2 px-4 border-2 border-black">Design your own crossword puzzle with up to 10 clues</p>
+      {/* Crossword Creator Title */}
+      <div className="flex flex-col items-center mb-8">
+        <h1 className="text-4xl font-extrabold text-black mb-2">Crossword Creator</h1>
+        <p className="text-gray-700 text-xl mb-4">Design your own crossword puzzle with up to 10 clues</p>
       </div>
 
       {/* My Crosswords Section */}
-      <div id="my-puzzles" className="mb-8 bg-white backdrop-blur-sm shadow-lg p-6 border-2 border-black">
+      <div className="bg-white rounded-lg shadow p-6 border-2 border-black mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-800">My Crosswords</h2>
-            <p className="text-sm text-gray-500 mt-1">
-              Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, totalCrosswords)} of {totalCrosswords} puzzles
-            </p>
+            <h2 className="text-xl font-bold text-black">My Crosswords</h2>
+            <p className="text-sm text-gray-500 mt-1">Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, totalCrosswords)} of {totalCrosswords} puzzles</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setEditingId(null);
-                setPuzzleName('');
-                setEntries([{ question: '', answer: '' }]);
-                document.getElementById('puzzle-info')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="flex-1 px-4 py-2 rounded-lg border-2 border-black text-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-              Create New
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              setIsEditing(false);
+              setEditingId(null);
+              setPuzzleName('');
+              setEntries([{ question: '', answer: '' }]);
+              document.getElementById('puzzle-info')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="px-4 py-2 rounded-full border-2 border-black text-black bg-[#FFD34E] hover:bg-yellow-300 transition-all duration-200 flex items-center justify-center font-bold"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 mr-2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            Create New
+          </button>
         </div>
 
         {isFetchingCrosswords ? (
@@ -772,7 +765,7 @@ const generateAndSavePuzzle = async () => {
         </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {crosswords.map((crossword) => (
                 <div
                   key={crossword.id}
@@ -813,7 +806,7 @@ const generateAndSavePuzzle = async () => {
                           <button
                             onClick={() => handleStopSession(crossword)}
                             className="inline-flex items-center justify-center w-10 h-10 rounded-full !p-0 flex-none
-                                       bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
+                                        bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
                           >
                             <Square className="w-4 h-4" />
                           </button>
@@ -822,7 +815,7 @@ const generateAndSavePuzzle = async () => {
                               href={`/waiting-room/host/${crossword.id}/${crossword.session_code}`}
                               target="_blank"
                               className="inline-flex items-center justify-center w-10 h-10 rounded-full !p-0 flex-none
-                                         bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
+                                          bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
                             >
                               <Presentation className="w-4 h-4" />
                             </Link>
@@ -833,7 +826,7 @@ const generateAndSavePuzzle = async () => {
                               target="_blank"
                               href={`/crossword/${crossword.id}/${crossword.session_code}`} 
                               className="inline-flex items-center justify-center w-10 h-10 rounded-full !p-0 flex-none
-                                         bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
+                                          bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
                             >
                               <Eye className="w-4 h-4" /> {/* Eye icon to view game */}
                             </Link>
@@ -843,7 +836,7 @@ const generateAndSavePuzzle = async () => {
                         <button
                           onClick={() => handlePresentCrossword(crossword)}
                           className="inline-flex items-center justify-center w-10 h-10 rounded-full !p-0 flex-none
-                                     bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
+                                      bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
                         >
                           <Play className="w-4 h-4" />
                         </button>
@@ -922,7 +915,7 @@ const generateAndSavePuzzle = async () => {
         )}
       </div>
 
-      <div id="puzzle-info" className="mb-6 bg-white shadow-lg p-6 border-2 border-black">
+      <div id="puzzle-info" className="mb-6 bg-white shadow-lg p-6 border-2 border-black rounded-lg">
         <h2 className="text-xl font-semibold text-black mb-4">
           {isEditing ? 'Edit Puzzle' : 'Create New Puzzle'}
         </h2>
@@ -941,7 +934,7 @@ const generateAndSavePuzzle = async () => {
         </div>
       </div>
 
-      <div className="bg-white shadow-lg p-6 border-2 border-black">
+      <div className="bg-white shadow-lg p-6 border-2 border-black rounded-lg">
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-black mb-2">Questions & Answers</h2>
           <p className="text-gray-600">
@@ -1045,6 +1038,6 @@ const generateAndSavePuzzle = async () => {
         </div>
       </div>
       <ModalLoading isOpen={isLoading} />
-    </div>
+    </>
   );
 }

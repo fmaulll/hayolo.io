@@ -9,6 +9,10 @@ const config: Config = {
       backgroundColor: {
         'white': '#ffffff',
       },
+      fontFamily: {
+        sans: ['Oswald', 'Arial', 'sans-serif'],
+        oswald: ['Oswald', 'Arial', 'sans-serif'],
+      },
     },
   },
   plugins: [],

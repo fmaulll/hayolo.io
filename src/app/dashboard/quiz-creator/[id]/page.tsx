@@ -577,25 +577,20 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="container">
-      <div className="flex flex-col items-center justify-center mb-8">
-        <h1 className="text-4xl font-bold text-black mb-4 bg-white backdrop-blur-sm shadow-lg py-4 px-6 border-2 border-black">
-          Quiz Editor
-        </h1>
-        <p className="text-gray-600 text-lg bg-white backdrop-blur-sm shadow-lg py-2 px-4 border-2 border-black">
-          Edit your quiz questions and settings
-        </p>
+    <>
+      {/* Quiz Title & Description */}
+      <div className="flex flex-col items-center mb-8">
+        <h1 className="text-4xl font-extrabold text-black mb-2">Quiz Editor</h1>
+        <p className="text-gray-700 text-xl mb-4">Edit your quiz questions and settings</p>
       </div>
 
       {/* Quiz Details Section */}
-      <div className="mb-6 bg-white shadow-lg p-6 border-2 border-black">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-black mb-4">
-            Quiz Information
-          </h2>
+      <div className="bg-white rounded-lg shadow p-6 border-2 border-black mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-black">Quiz Information</h2>
           <button
             onClick={() => setIsEditingQuizDetails(true)}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-none border-2 border-black text-black hover:bg-gray-100 transition-all"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-black text-black hover:bg-[#FFD34E] transition-all"
           >
             <Edit className="w-4 h-4" />
           </button>
@@ -701,10 +696,10 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
       </div>
 
       {/* Two-column layout: Preview & Questions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Preview Section */}
-        <div className="bg-white shadow-lg border-2 border-black p-6 min-h-[420px] max-h-[720px] sticky top-8 self-start">
-          <h2 className="text-xl font-semibold text-black mb-4">Preview</h2>
+        <div className="bg-white rounded-lg shadow-lg border-2 border-black p-6 min-h-[420px] max-h-[720px] sticky top-8 self-start">
+          <h2 className="text-xl font-bold text-black mb-4">Preview</h2>
           {questions.length === 0 ? (
             <div className="text-gray-500">No questions to preview.</div>
           ) : (
@@ -790,18 +785,16 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
         </div>
 
         {/* Questions Section */}
-        <div className='bg-white shadow-lg border-2 border-black p-6 min-h-[300px]'>
+        <div className="bg-white rounded-lg shadow-lg border-2 border-black p-6 min-h-[300px]">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-semibold text-black">Questions</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                {questions.length} questions added
-              </p>
+              <h2 className="text-xl font-bold text-black">Questions</h2>
+              <p className="text-sm text-gray-500 mt-1">{questions.length} questions added</p>
             </div>
             <button
               onClick={handleAddQuestion}
               disabled={questions.length >= 30}
-              className="px-4 py-2 rounded-lg border-2 border-black text-black hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center"
+              className="px-4 py-2 rounded-full border-2 border-black text-black bg-[#FFD34E] hover:bg-yellow-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center font-bold"
             >
               <Plus className="h-4 w-4 mr-2" />
               Add Question {questions.length >= 30 && '(Max 30)'}
@@ -1138,6 +1131,6 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

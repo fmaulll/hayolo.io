@@ -75,188 +75,115 @@ export default function DashboardLayout({
   }
 
   return (
-    <main className="min-h-screen bg-white bg-[url('/background-seamless.png')] bg-repeat">
+    <main className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white backdrop-blur-sm border-b-2 border-black shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link 
-              href="/dashboard"
-              className="flex items-center gap-2 text-black font-bold text-xl hover:text-gray-800 transition-colors"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-              </svg>
-              <span className="hidden sm:inline">QuestionBoard</span>
-            </Link>
-
-            {/* Mobile menu button */}
-            <div className="flex md:hidden">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setShowMobileMenu(!showMobileMenu)
-                }}
-                className="inline-flex items-center justify-center p-2 rounded-none text-black hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-0 focus:border-none border border-black"
+      <header className="bg-[#FFD34E] shadow-md border-b-2 border-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-4 mb-4 md:mb-0">
+            <span className="text-2xl font-extrabold text-black tracking-tight">hayolo.io</span>
+            <nav className="hidden md:flex items-center gap-8 ml-8">
+              <Link 
+                href="/dashboard"
+                className={`text-lg transition-colors ${pathname === '/dashboard' ? 'text-black font-bold' : 'text-gray-700 hover:text-black'}`}
               >
-                <span className="sr-only">Open main menu</span>
-                {!showMobileMenu ? (
-                  <Menu className="block h-6 w-6" /> // Lucide Menu icon
-                ) : (
-                  <X className="block h-6 w-6" /> // Lucide X icon
-                )}
-              </button>
-            </div>
-
-            <div className="hidden md:flex items-center gap-4">
-              <nav className="flex items-center gap-6">
-                <Link 
-                  href="/dashboard"
-                  className={`font-medium transition-colors ${pathname === '/dashboard' ? 'text-black border-b-2 border-black pb-1' : 'text-gray-700 hover:text-black'}`}
-                >
-                  Home
-                </Link>
-                <div className="h-6 w-px bg-black"></div> {/* Solid black divider */}
-                <Link 
-                  href="/dashboard/anonymous-question"
-                  className={`font-medium transition-colors ${pathname.includes('/dashboard/anonymous-question') ? 'text-black border-b-2 border-black pb-1' : 'text-gray-700 hover:text-black'}`}
-                >
-                  Anonymous Q&A
-                </Link>
-                <Link 
-                  href="/dashboard/quiz-creator"
-                  className={`font-medium transition-colors ${pathname.includes('/dashboard/quiz-creator') ? 'text-black border-b-2 border-black pb-1' : 'text-gray-700 hover:text-black'}`}
-                >
-                  Quiz Creator
-                </Link>
-                <Link 
-                  href="/dashboard/crossword-puzzle"
-                  className={`relative font-medium transition-colors ${pathname.includes('/dashboard/crossword-puzzle') ? 'text-black border-b-2 border-black pb-1' : 'text-gray-700 hover:text-black'}`}
-                >
-                  Crossword Puzzle
-                  <span className="absolute bottom-[-28px] left-1/2 -translate-x-1/2 text-xs text-black border-2 border-black px-2 py-1 bg-white whitespace-nowrap flex items-center justify-center shadow-sm">
-                    BETA
-                  </span>
-                </Link>
-              </nav>
-              <div className="h-6 w-px bg-black"></div> {/* Solid black divider */}
-              <div className="relative" ref={userMenuRef}>
-                <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 group"
-                >
-                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-black font-medium border border-black">
-                    {userName?.[0].toUpperCase()}
-                  </div>
-                  <span className="text-black group-hover:text-gray-800">{userName}</span>
-                  <ChevronDown className={`w-5 h-5 text-black transition-transform ${showUserMenu ? 'rotate-180' : ''}`} /> {/* Lucide ChevronDown */}
-                </button>
-
-                {/* User Dropdown Menu */}
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-none shadow-lg py-1 border-2 border-black z-10"> {/* Added z-10 */}
-                    <Link
-                      href="/dashboard/billing"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
-                    >
-                      <CreditCard className="w-5 h-5" /> {/* Lucide CreditCard */}
-                      Billing
-                    </Link>
-                    <Link
-                      href="/dashboard/settings"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
-                    >
-                      <Settings className="w-5 h-5" /> {/* Lucide Settings */}
-                      Settings
-                    </Link>
-                    <div className="border-t border-black my-1"></div> {/* Solid black divider */}
-                    <button
-                      onClick={handleSignOut}
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-100 w-full text-left transition-colors"
-                    >
-                      <LogOut className="w-5 h-5" /> {/* Lucide LogOut */}
-                      Sign Out
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+                Home
+              </Link>
+              <Link 
+                href="/dashboard/anonymous-question"
+                className={`text-lg transition-colors ${pathname.includes('/dashboard/anonymous-question') ? 'text-black font-bold' : 'text-gray-700 hover:text-black'}`}
+              >
+                Anonymous Q&A
+              </Link>
+              <Link 
+                href="/dashboard/quiz-creator"
+                className={`text-lg transition-colors ${pathname.includes('/dashboard/quiz-creator') ? 'text-black font-bold' : 'text-gray-700 hover:text-black'}`}
+              >
+                Quiz Creator
+              </Link>
+              <Link 
+                href="/dashboard/crossword-puzzle"
+                className={`text-lg transition-colors ${pathname.includes('/dashboard/crossword-puzzle') ? 'text-black font-bold' : 'text-gray-700 hover:text-black'}`}
+              >
+                Crossword Puzzle
+              </Link>
+            </nav>
           </div>
-
-          {/* Mobile menu (Expanded) */}
-          {showMobileMenu && (
-            <div 
-              className="md:hidden border-t-2 border-black pt-4 pb-3" // Added border-t for visual separation
-              ref={mobileMenuRef} // Set ref here for click outside
-            >
-              <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <Link 
-                  href="/dashboard"
-                  onClick={() => setShowMobileMenu(false)}
-                  className={`block px-3 py-2 rounded-none text-base font-medium ${pathname === '/dashboard' ? 'bg-gray-100 text-black border border-black' : 'text-gray-700 hover:bg-gray-100 hover:text-black'}`}
-                >
-                  Home
-                </Link>
-                <Link 
-                  href="/dashboard/anonymous-question"
-                  onClick={() => setShowMobileMenu(false)}
-                  className={`block px-3 py-2 rounded-none text-base font-medium ${pathname === '/dashboard/anonymous-question' ? 'bg-gray-100 text-black border border-black' : 'text-gray-700 hover:bg-gray-100 hover:text-black'}`}
-                >
-                  Anonymous Q&A
-                </Link>
-                <Link 
-                  href="/dashboard/crossword-puzzle"
-                  onClick={() => setShowMobileMenu(false)}
-                  className={`block px-3 py-2 rounded-none text-base font-medium ${pathname === '/dashboard/crossword-puzzle' ? 'bg-gray-100 text-black border border-black' : 'text-gray-700 hover:bg-gray-100 hover:text-black'}`}
-                >
-                  Crossword Puzzle
-                </Link>
-              </div>
-              <div className="pt-4 pb-3 border-t-2 border-black">
-                <div className="flex items-center px-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-black font-medium border border-black">
-                      {userName?.[0].toUpperCase()}
-                    </div>
-                  </div>
-                  <div className="ml-3">
-                    <div className="text-base font-medium text-black">{userName}</div>
-                  </div>
+          {/* User menu (keep as is, but style for yellow bg) */}
+          <div className="flex items-center gap-4">
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 group bg-white border-2 border-black rounded-full px-4 py-2 font-bold text-black shadow hover:bg-gray-100 transition-colors"
+              >
+                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-black font-bold border border-black">
+                  {userName?.[0].toUpperCase()}
                 </div>
-                <div className="mt-3 px-2 space-y-1">
+                <span className="text-black group-hover:text-gray-800">{userName}</span>
+                <ChevronDown className={`w-5 h-5 text-black transition-transform ${showUserMenu ? 'rotate-180' : ''}`} />
+              </button>
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 border-2 border-black z-10">
                   <Link
                     href="/dashboard/billing"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="block px-3 py-2 rounded-none text-base font-medium text-black hover:bg-gray-100"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
                   >
+                    <CreditCard className="w-5 h-5" />
                     Billing
                   </Link>
                   <Link
                     href="/dashboard/settings"
-                    onClick={() => setShowMobileMenu(false)}
-                    className="block px-3 py-2 rounded-none text-base font-medium text-black hover:bg-gray-100"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
                   >
+                    <Settings className="w-5 h-5" />
                     Settings
                   </Link>
+                  <div className="border-t border-black my-1"></div>
                   <button
-                    onClick={() => {
-                      setShowMobileMenu(false)
-                      handleSignOut()
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-none text-base font-medium text-black hover:bg-gray-100"
+                    onClick={handleSignOut}
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-black hover:bg-gray-100 w-full text-left transition-colors"
                   >
+                    <LogOut className="w-5 h-5" />
                     Sign Out
                   </button>
                 </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
+        {/* Mobile nav */}
+        <nav className="md:hidden flex gap-4 px-4 pb-2">
+          <Link 
+            href="/dashboard"
+            className={`font-bold text-base transition-colors ${pathname === '/dashboard' ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+          >
+            Home
+          </Link>
+          <Link 
+            href="/dashboard/anonymous-question"
+            className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/anonymous-question') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+          >
+            Anonymous Q&A
+          </Link>
+          <Link 
+            href="/dashboard/quiz-creator"
+            className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/quiz-creator') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+          >
+            Quiz Creator
+          </Link>
+          <Link 
+            href="/dashboard/crossword-puzzle"
+            className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/crossword-puzzle') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+          >
+            Crossword Puzzle
+          </Link>
+        </nav>
       </header>
 
       {/* Page Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12"> {/* Reduced padding for mobile, increased for desktop */}
-        {children}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="bg-[#FFD34E] rounded-xl shadow-xl border-2 border-black p-8 min-h-[70vh]">
+          {children}
+        </div>
       </div>
     </main>
   )
