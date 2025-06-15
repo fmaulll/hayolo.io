@@ -54,13 +54,13 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Navigation Header */}
       <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b-2 border-black shadow-sm">
-        <nav className="mx-auto max-w-7xl" aria-label="Global">
+        <nav className="mx-auto max-w-7xl px-6 lg:px-8" aria-label="Global">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="text-2xl font-extrabold text-black flex items-center gap-2 font-oswald hover:text-gray-800 transition-colors">
-            hayolo.io
+              hayolo.io
             </Link>
-            <div className="flex items-center gap-x-12">
-              <div className="hidden lg:flex lg:gap-x-8">
+            <div className="hidden lg:flex items-center gap-x-12">
+              <div className="flex lg:gap-x-8">
                 <Link href="/product" className="text-lg font-medium text-black hover:text-gray-800 transition-colors">
                   Product
                 </Link>
@@ -80,8 +80,6 @@ export default function Home() {
                       className={`h-5 w-5 transition-transform text-black ${isResourcesOpen ? 'rotate-180' : ''}`}
                     />
                   </button>
-                  
-                  {/* Resources Dropdown */}
                   {isResourcesOpen && (
                     <div className="absolute left-0 mt-2 w-48 rounded-lg bg-white py-2 shadow-lg border-2 border-black z-10">
                       <Link
@@ -116,10 +114,10 @@ export default function Home() {
                   Get Started
                 </Link>
               </div>
-              {/* Mobile menu button */}
+              {/* Burger menu button */}
               <button
-                onClick={handleMobileMenuClick}
-                className="lg:hidden inline-flex items-center justify-center p-2 rounded-none text-black hover:text-gray-700 hover:bg-gray-100 transition-colors border-2 border-black"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden inline-flex items-center justify-center p-2 rounded-lg text-black hover:text-gray-700 hover:bg-gray-100 transition-colors border-2 border-black"
               >
                 <span className="sr-only">Open main menu</span>
                 {!isMobileMenuOpen ? (
@@ -130,35 +128,31 @@ export default function Home() {
               </button>
             </div>
           </div>
-
           {/* Mobile menu */}
           {isMobileMenuOpen && (
-            <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b-2 border-black shadow-lg z-40" ref={mobileMenuRef}>
+            <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b-2 border-black shadow-lg z-40">
               <div className="space-y-1 px-2 pb-3 pt-2">
                 <Link
                   href="/product"
-                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
-                  onClick={handleMobileMenuItemClick}
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-lg transition-colors"
                 >
                   Product
                 </Link>
                 <Link
                   href="/pricing"
-                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
-                  onClick={handleMobileMenuItemClick}
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-lg transition-colors"
                 >
                   Pricing
                 </Link>
                 <Link
                   href="/use-cases"
-                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
-                  onClick={handleMobileMenuItemClick}
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-lg transition-colors"
                 >
                   Use Cases
                 </Link>
                 <button
-                  onClick={handleMobileResourcesClick}
-                  className="flex w-full items-center justify-between px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                  onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+                  className="flex w-full items-center justify-between px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-lg transition-colors"
                 >
                   Resources
                   <ChevronDown
@@ -169,15 +163,13 @@ export default function Home() {
                   <div className="pl-4 border-l border-black ml-3">
                     <Link
                       href="/documentation"
-                      className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
-                      onClick={handleMobileMenuItemClick}
+                      className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-lg transition-colors"
                     >
                       Documentation
                     </Link>
                     <Link
                       href="/blog"
-                      className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
-                      onClick={handleMobileMenuItemClick}
+                      className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-lg transition-colors"
                     >
                       Blog
                     </Link>
@@ -186,15 +178,13 @@ export default function Home() {
                 <div className="border-t-2 border-black my-4"></div>
                 <Link
                   href="/login"
-                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
-                  onClick={handleMobileMenuItemClick}
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-lg transition-colors"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="block px-3 py-2 text-base font-medium text-white bg-black hover:bg-gray-800 rounded-none transition-colors border border-black"
-                  onClick={handleMobileMenuItemClick}
+                  className="block px-3 py-2 text-base font-medium text-black bg-[#FFD34E] hover:bg-yellow-500 rounded-lg transition-colors border-2 border-black"
                 >
                   Get Started
                 </Link>
@@ -207,7 +197,7 @@ export default function Home() {
       {/* Main Content */}
       <main>
         {/* Hero Section */}
-        <div className="relative isolate px-6 pt-24 lg:px-8">
+        <div className="relative isolate px-6 pt-24 lg:px-8 h-screen">
           <div className="mx-auto max-w-7xl py-16 sm:py-24 lg:py-32">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
@@ -226,7 +216,7 @@ export default function Home() {
                 <div className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-4">
                   <Link
                     href="/dashboard"
-                    className="w-full sm:w-auto rounded-lg bg-[#FFD34E] px-6 py-3 text-lg font-bold text-black shadow-md hover:bg-yellow-300 hover:shadow-lg transition-all border-2 border-black font-oswald"
+                    className="w-full sm:w-auto rounded-lg bg-[#FFD34E] px-6 py-3 text-lg font-bold text-black shadow-md hover:bg-yellow-300 hover:shadow-lg transition-all border-2 border-black font-oswald text-center"
                   >
                     Start Teaching
                   </Link>

@@ -80,7 +80,12 @@ export default function DashboardLayout({
       <header className="bg-[#FFD34E] shadow-md border-b-2 border-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4 mb-4 md:mb-0">
-            <span className="text-2xl font-extrabold text-black tracking-tight">hayolo.io</span>
+            <Link
+              href="/" 
+              className="text-2xl font-extrabold text-black tracking-tight"
+            >
+              hayolo.io
+            </Link>
             <nav className="hidden md:flex items-center gap-8 ml-8">
               <Link 
                 href="/dashboard"
@@ -109,7 +114,7 @@ export default function DashboardLayout({
             </nav>
           </div>
           {/* User menu (keep as is, but style for yellow bg) */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between gap-4">
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
@@ -148,35 +153,49 @@ export default function DashboardLayout({
                 </div>
               )}
             </div>
+            {/* Burger menu button */}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="md:hidden inline-flex items-center justify-center p-2 rounded-lg text-black hover:text-gray-700 hover:bg-gray-100 transition-colors border-2 border-black"
+            >
+              <span className="sr-only">Open main menu</span>
+              {!showMobileMenu ? (
+                <Menu className="block h-6 w-6" />
+              ) : (
+                <X className="block h-6 w-6" />
+              )}
+            </button>
           </div>
         </div>
         {/* Mobile nav */}
-        <nav className="md:hidden flex gap-4 px-4 pb-2">
-          <Link 
-            href="/dashboard"
-            className={`font-bold text-base transition-colors ${pathname === '/dashboard' ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
-          >
-            Home
-          </Link>
-          <Link 
-            href="/dashboard/anonymous-question"
-            className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/anonymous-question') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
-          >
-            Anonymous Q&A
-          </Link>
-          <Link 
-            href="/dashboard/quiz-creator"
-            className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/quiz-creator') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
-          >
-            Quiz Creator
-          </Link>
-          <Link 
-            href="/dashboard/crossword-puzzle"
-            className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/crossword-puzzle') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
-          >
-            Crossword Puzzle
-          </Link>
-        </nav>
+        {showMobileMenu && (
+          <nav className="md:hidden flex flex-col gap-4 px-4 pb-2">
+            <Link 
+              href="/dashboard"
+              className={`font-bold text-base transition-colors ${pathname === '/dashboard' ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+            >
+              Home
+            </Link>
+            <Link 
+              href="/dashboard/anonymous-question"
+              className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/anonymous-question') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+            >
+              Anonymous Q&A
+            </Link>
+            <Link 
+              href="/dashboard/quiz-creator"
+              className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/quiz-creator') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+            >
+              Quiz Creator
+            </Link>
+            <Link 
+              href="/dashboard/crossword-puzzle"
+              className={`font-bold text-base transition-colors ${pathname.includes('/dashboard/crossword-puzzle') ? 'text-black underline underline-offset-4' : 'text-gray-700 hover:text-black'}`}
+            >
+              Crossword Puzzle
+            </Link>
+          </nav>
+        )}
       </header>
 
       {/* Page Content */}

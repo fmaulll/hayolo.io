@@ -59,7 +59,7 @@ export default function CreateCrosswordPage() {
   const [crosswordToDelete, setCrosswordToDelete] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCrosswords, setTotalCrosswords] = useState(0);
-  const ITEMS_PER_PAGE = 4;
+  const ITEMS_PER_PAGE = 6;
 
   const fetchCrosswords = async () => {
     setIsFetchingCrosswords(true);
@@ -765,7 +765,7 @@ export default function CreateCrosswordPage() {
         </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {crosswords.map((crossword) => (
                 <div
                   key={crossword.id}
@@ -775,7 +775,7 @@ export default function CreateCrosswordPage() {
                     <button
                       onClick={() => handleDeleteClick(crossword.id)}
                       disabled={isDeleting && deletingId === crossword.id}
-                      className="inline-flex items-center justify-center w-10 h-10 rounded-none border border-black text-black hover:bg-gray-100 transition-all disabled:opacity-50"
+                      className="inline-flex items-center justify-center w-8 h-8 rounded-none border-2 border-black text-black hover:bg-gray-100 transition-all disabled:opacity-50"
                     >
                       {isDeleting && deletingId === crossword.id ? (
                         <svg className="animate-spin h-4 w-4 text-black" viewBox="0 0 24 24">
@@ -790,7 +790,7 @@ export default function CreateCrosswordPage() {
 
                   <div className="p-6">
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-black transition-colors line-clamp-1 flex items-center">
-                      {crossword.name}
+                      {crossword.name.length > 15 ? crossword.name.slice(0, 15) + '...' : crossword.name}
                       <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-gray-100 text-black border border-black">
                         {crossword.entries.length} clues
                       </span>
@@ -952,7 +952,7 @@ export default function CreateCrosswordPage() {
                 {entries.length > 1 && (
                   <button
                     onClick={() => removeEntry(index)}
-                    className="text-black hover:text-gray-700 hover:bg-gray-100 p-1 rounded-full transition-colors duration-200"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-none border-2 border-black text-black hover:bg-gray-100 transition-all disabled:opacity-50"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

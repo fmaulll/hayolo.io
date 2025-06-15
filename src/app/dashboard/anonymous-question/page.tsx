@@ -326,7 +326,7 @@ export default function AnonymousQuestion() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {boards.map((board) => (
               <div
                 key={board.id}
@@ -336,7 +336,7 @@ export default function AnonymousQuestion() {
                   <button
                     onClick={() => handleDeleteClick(board.id)}
                     disabled={isDeleting && deletingId === board.id}
-                    className="inline-flex items-center justify-center w-10 h-10 rounded-none border border-black text-black hover:bg-gray-100 transition-all disabled:opacity-50"
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-none border-2 border-black text-black hover:bg-gray-100 transition-all disabled:opacity-50"
                   >
                     {isDeleting && deletingId === board.id ? (
                       <svg className="animate-spin h-4 w-4 text-black" viewBox="0 0 24 24">
