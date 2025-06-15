@@ -1,103 +1,391 @@
-import Image from "next/image";
+// app/page.tsx (Home component)
+'use client'
+
+import Link from 'next/link'
+import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image' // Assuming Image component is used, although it's not in the provided JSX
+import { Menu, X, ChevronDown, User, Clock, MessageSquare, Heart, Plus, Edit, Send } from 'lucide-react'; // Added necessary Lucide icons
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [isResourcesOpen, setIsResourcesOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const resourcesRef = useRef<HTMLDivElement>(null)
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  // Close menus when route changes
+  useEffect(() => {
+    setIsResourcesOpen(false)
+    setIsMobileMenuOpen(false)
+  }, [])
+
+  // Handle click outside of menus
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (resourcesRef.current && !resourcesRef.current.contains(event.target as Node)) {
+        setIsResourcesOpen(false)
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node) && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isMobileMenuOpen])
+
+  const handleMobileResourcesClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsResourcesOpen(!isResourcesOpen)
+  }
+
+  const handleMobileMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setIsMobileMenuOpen(!isMobileMenuOpen)
+    if (!isMobileMenuOpen) {
+      setIsResourcesOpen(false)
+    }
+  }
+
+  const handleMobileMenuItemClick = () => {
+    setIsMobileMenuOpen(false)
+    setIsResourcesOpen(false)
+  }
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navigation Header */}
+      <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b-2 border-black shadow-sm">
+        <nav className="mx-auto max-w-7xl px-6 lg:px-8" aria-label="Global">
+          <div className="flex items-center justify-between h-16">
+            <Link href="/" className="text-xl font-bold text-black flex items-center gap-2 hover:text-gray-800 transition-colors">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
+              </svg>
+              QuestionBoard
+            </Link>
+            <div className="flex items-center gap-x-12">
+              <div className="hidden lg:flex lg:gap-x-8">
+                <Link href="/product" className="text-sm font-medium text-black hover:text-gray-800 transition-colors">
+                  Product
+                </Link>
+                <Link href="/pricing" className="text-sm font-medium text-black hover:text-gray-800 transition-colors">
+                  Pricing
+                </Link>
+                <Link href="/use-cases" className="text-sm font-medium text-black hover:text-gray-800 transition-colors">
+                  Use Cases
+                </Link>
+                <div ref={resourcesRef} className="relative">
+                  <button
+                    onClick={() => setIsResourcesOpen(!isResourcesOpen)}
+                    className="flex items-center gap-x-1 text-sm font-medium text-black hover:text-gray-800 transition-colors"
+                  >
+                    Resources
+                    <ChevronDown
+                      className={`h-5 w-5 transition-transform text-black ${isResourcesOpen ? 'rotate-180' : ''}`}
+                    />
+                  </button>
+                  
+                  {/* Resources Dropdown */}
+                  {isResourcesOpen && (
+                    <div className="absolute left-0 mt-2 w-48 rounded-none bg-white py-2 shadow-lg border-2 border-black z-10">
+                      <Link
+                        href="/documentation"
+                        className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
+                      >
+                        Documentation
+                      </Link>
+                      <Link
+                        href="/blog"
+                        className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition-colors"
+                      >
+                        Blog
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center gap-x-6">
+              <div className="hidden lg:flex items-center gap-x-6">
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-black hover:text-gray-800 transition-colors"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="rounded-none bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-gray-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-all border border-black"
+                >
+                  Get Started
+                </Link>
+              </div>
+              {/* Mobile menu button */}
+              <button
+                onClick={handleMobileMenuClick}
+                className="lg:hidden inline-flex items-center justify-center p-2 rounded-none text-black hover:text-gray-700 hover:bg-gray-100 transition-colors border-2 border-black"
+              >
+                <span className="sr-only">Open main menu</span>
+                {!isMobileMenuOpen ? (
+                  <Menu className="block h-6 w-6" />
+                ) : (
+                  <X className="block h-6 w-6" />
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile menu */}
+          {isMobileMenuOpen && (
+            <div className="lg:hidden absolute top-16 left-0 w-full bg-white border-b-2 border-black shadow-lg z-40" ref={mobileMenuRef}>
+              <div className="space-y-1 px-2 pb-3 pt-2">
+                <Link
+                  href="/product"
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                  onClick={handleMobileMenuItemClick}
+                >
+                  Product
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                  onClick={handleMobileMenuItemClick}
+                >
+                  Pricing
+                </Link>
+                <Link
+                  href="/use-cases"
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                  onClick={handleMobileMenuItemClick}
+                >
+                  Use Cases
+                </Link>
+                <button
+                  onClick={handleMobileResourcesClick}
+                  className="flex w-full items-center justify-between px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                >
+                  Resources
+                  <ChevronDown
+                    className={`h-5 w-5 transition-transform text-black ${isResourcesOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {isResourcesOpen && (
+                  <div className="pl-4 border-l border-black ml-3">
+                    <Link
+                      href="/documentation"
+                      className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                      onClick={handleMobileMenuItemClick}
+                    >
+                      Documentation
+                    </Link>
+                    <Link
+                      href="/blog"
+                      className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                      onClick={handleMobileMenuItemClick}
+                    >
+                      Blog
+                    </Link>
+                  </div>
+                )}
+                <div className="border-t-2 border-black my-4"></div>
+                <Link
+                  href="/login"
+                  className="block px-3 py-2 text-base font-medium text-black hover:bg-gray-100 hover:text-gray-800 rounded-none transition-colors"
+                  onClick={handleMobileMenuItemClick}
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/dashboard"
+                  className="block px-3 py-2 text-base font-medium text-white bg-black hover:bg-gray-800 rounded-none transition-colors border border-black"
+                  onClick={handleMobileMenuItemClick}
+                >
+                  Get Started
+                </Link>
+              </div>
+            </div>
+          )}
+        </nav>
+      </header>
+
+      {/* Main Content */}
+      <main>
+        {/* Hero Section */}
+        <div className="relative isolate px-6 pt-14 lg:px-8">
+          <div className="mx-auto max-w-7xl py-24 sm:py-32 lg:py-40">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-none text-black font-medium text-sm mb-8 border border-black">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-black">
+                    <path d="M11.7 2.805a.75.75 0 0 1 .6 0A60.65 60.65 0 0 1 22.83 8.72a.75.75 0 0 1-.231 1.337 49.948 49.948 0 0 0-9.902 3.912l-.003.002c-.114.06-.227.119-.34.18a.75.75 0 0 1-.707 0A50.88 50.88 0 0 0 7.5 12.173v-.224c0-.131.067-.248.172-.311a54.615 54.615 0 0 1 4.653-2.52.75.75 0 0 0-.65-1.352 56.123 56.123 0 0 0-4.78 2.589 1.858 1.858 0 0 0-.859 1.228 49.803 49.803 0 0 0-4.634-1.527.75.75 0 0 1-.231-1.337A60.653 60.653 0 0 1 11.7 2.805Z" />
+                    <path d="M13.06 15.473a48.45 48.45 0 0 1 7.666-3.282c.134 1.414.22 2.843.255 4.284a.75.75 0 0 1-.46.71 47.87 47.87 0 0 0-8.105 4.342.75.75 0 0 1-.832 0 47.87 47.87 0 0 0-8.104-4.342.75.75 0 0 1-.461-.71c.035-1.441.12-2.87.255-4.284a48.45 48.45 0 0 1 7.666 3.282.75.75 0 0 0 .832 0 47.87 47.87 0 0 0 8.104-4.342.75.75 0 0 1 .461-.71c.035-1.441.12-2.87.255-4.284a48.45 48.45 0 0 1 7.666 3.282.75.75 0 0 0 .832 0Z" />
+                  </svg>
+                  For Teachers & Students
+                </div>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-black mb-6">
+                  Make Learning Interactive & Fun
+                </h1>
+                <p className="text-lg text-gray-700 mb-8">
+                  Create engaging question boards that spark curiosity and participation. Perfect for classrooms, 
+                  workshops, and interactive learning sessions.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center gap-x-6 gap-y-4">
+                  <Link
+                    href="/dashboard"
+                    className="w-full sm:w-auto rounded-none bg-black px-6 py-3 text-lg font-medium text-white shadow-md hover:bg-gray-800 hover:shadow-lg transition-all border border-black"
+                  >
+                    Start Teaching
+                  </Link>
+                  <Link
+                    href="/about"
+                    className="w-full sm:w-auto text-lg font-medium text-black hover:text-gray-800 transition-colors flex items-center justify-center gap-2 border border-black px-6 py-3 rounded-none"
+                  >
+                    Watch Demo
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-black">
+                      <path fillRule="evenodd" d="M4.5 5.653c0-1.427 1.529-2.33 2.779-1.643l11.54 6.347c1.295.712 1.295 2.573 0 3.286L7.28 19.99c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clipRule="evenodd" />
+                    </svg>
+                  </Link>
+                </div>
+              </div>
+              <div className="relative">
+                <div className="absolute -inset-4 bg-gray-100/50 rounded-none transform rotate-3 shadow-xl"></div>
+                <div className="relative bg-white p-8 rounded-none shadow-xl border-2 border-black"> {/* Main card container */}
+                  {/* Static Question Card 1 - Mimics QuestionCard layout */}
+                  <div className="flex flex-col h-full justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-700 mb-1">
+                        <User className="w-5 h-5 flex-shrink-0 text-black" />
+                        <span className="truncate">Sarah • Biology Class</span>
+                      </div>
+                      <p className="break-words text-black cursor-pointer hover:text-gray-800 transition-colors mt-4">
+                        Why is photosynthesis important?
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 mt-4 pt-4 border-t-2 border-black border-dashed">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 flex-shrink-0 text-black" />
+                          <span>5 minutes ago</span>
+                          <span className="text-black">•</span>
+                          <button className="flex items-center gap-1.5 cursor-pointer hover:text-black transition-colors p-1 -m-1 rounded-none">
+                            <MessageSquare className="w-4 h-4 flex-shrink-0 text-black" />
+                            <span>12</span>
+                          </button>
+                        </div>
+                        <button className="flex items-center gap-1.5 transition-colors p-1 -m-1 rounded-none text-black hover:text-gray-800">
+                          <Heart fill="black" className="w-4 h-4 flex-shrink-0" />
+                          <span>42</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Features Section */}
+        <div className="py-24 sm:py-32 bg-white">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl lg:text-center">
+              <h2 className="text-base font-semibold leading-7 text-black">Perfect for Education</h2>
+              <p className="mt-2 text-3xl font-bold tracking-tight text-black sm:text-4xl">
+                Designed for Teachers & Students
+              </p>
+              <p className="mt-6 text-lg leading-8 text-gray-700">
+                Create an interactive learning environment where every student feels empowered to participate and engage.
+              </p>
+            </div>
+            <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+              <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+                {[
+                  {
+                    name: 'For Teachers',
+                    description: 'Create interactive sessions, track participation, and identify areas where students need more support.',
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-black">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    name: 'For Students',
+                    description: 'Ask questions anonymously, participate in discussions, and learn from peer interactions.',
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-black">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                      </svg>
+                    ),
+                  },
+                  {
+                    name: 'Real-time Interaction',
+                    description: 'See questions and responses update instantly, creating dynamic and engaging learning sessions.',
+                    icon: (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-black">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                      </svg>
+                    ),
+                  },
+                ].map((feature) => (
+                  <div key={feature.name} className="flex flex-col">
+                    <dt className="text-lg font-semibold leading-7 text-black">
+                      <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-none bg-gray-100 text-black border-2 border-black">
+                        {feature.icon}
+                      </div>
+                      {feature.name}
+                    </dt>
+                    <dd className="mt-1 flex flex-auto flex-col text-base leading-7 text-gray-700">
+                      <p className="flex-auto">{feature.description}</p>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="relative isolate overflow-hidden bg-black py-16 sm:py-24 lg:py-32 border-t-2 border-b-2 border-black">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
+              <div className="max-w-xl lg:max-w-lg">
+                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">Ready to transform your classroom?</h2>
+                <p className="mt-4 text-lg leading-8 text-gray-200">
+                  Join thousands of educators who are making their classes more interactive and engaging with QuestionBoard.
+                </p>
+                <div className="mt-6 flex max-w-md gap-x-4">
+                  <Link
+                    href="/dashboard"
+                    className="rounded-none bg-white px-6 py-3 text-lg font-semibold text-black shadow-md hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-all duration-300 border border-white"
+                  >
+                    Get Started Free
+                  </Link>
+                </div>
+              </div>
+              <dl className="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:pt-2">
+                <div className="flex flex-col items-start">
+                  <div className="rounded-none bg-white/10 p-2 ring-1 ring-white/20 border border-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18m7.757 14.743l-1.59-1.59M6 10.5H3.75m4.007-4.243-1.59-1.59" />
+                    </svg>
+                  </div>
+                  <dt className="mt-4 font-semibold text-white">Quick Setup</dt>
+                  <dd className="mt-2 leading-7 text-gray-200">Create your first question board in minutes, no technical skills required.</dd>
+                </div>
+                <div className="flex flex-col items-start">
+                  <div className="rounded-none bg-white/10 p-2 ring-1 ring-white/20 border border-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                    </svg>
+                  </div>
+                  <dt className="mt-4 font-semibold text-white">Safe & Private</dt>
+                  <dd className="mt-2 leading-7 text-gray-200">Your classroom data is secure and private, with optional anonymous questions.</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
     </div>
-  );
+  )
 }
