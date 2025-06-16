@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Trash2, Edit, Save, Image as ImageIcon, ArrowUp, ArrowDown, Eye, X } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import ModalLoading from '@/app/components/ModalLoading';
+import ConfirmationModal from '@/components/ConfirmationModal';
 import Link from 'next/link';
 
 interface Quiz {
@@ -42,6 +43,8 @@ export default function QuizCreator() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [quizToDelete, setQuizToDelete] = useState<string | null>(null);
   const [newQuiz, setNewQuiz] = useState({
     title: '',
     description: '',
@@ -356,6 +359,33 @@ export default function QuizCreator() {
     setQuestions(updatedQuestions);
   };
 
+  const handleDeleteClick = async (quizId: string) => {
+    setQuizToDelete(quizId);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!quizToDelete) return;
+    
+    try {
+      const { error } = await supabase
+        .from('quizzes')
+        .delete()
+        .eq('id', quizToDelete);
+
+      if (error) throw error;
+
+      setQuizzes(quizzes.filter(quiz => quiz.id !== quizToDelete));
+      toast.success('Quiz deleted successfully');
+    } catch (error) {
+      console.error('Error deleting quiz:', error);
+      toast.error('Failed to delete quiz');
+    } finally {
+      setShowDeleteModal(false);
+      setQuizToDelete(null);
+    }
+  };
+
 //   if (isLoading) {
 //     return (
 //         <div className="min-h-screen flex items-center justify-center">
@@ -417,14 +447,14 @@ export default function QuizCreator() {
                 className="group relative bg-white rounded-xl border-dashed border-black shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border-2"
               >
                 {/* Top-right delete button (optional, if you have delete logic) */}
-                {/* <div className="absolute top-0 right-0 mt-4 mr-4 z-10">
+                <div className="absolute top-0 right-0 mt-4 mr-4 z-10">
                   <button
                     onClick={() => handleDeleteClick(quiz.id)}
                     className="inline-flex items-center justify-center w-8 h-8 rounded-none border-2 border-black text-black hover:bg-gray-100 transition-all disabled:opacity-50"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
-                </div> */}
+                </div> 
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 group-hover:text-black transition-colors line-clamp-1 flex items-center">
                     {quiz.title.length > 15 ? quiz.title.slice(0, 15) + '...' : quiz.title}
@@ -563,6 +593,20 @@ export default function QuizCreator() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setQuizToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title="Delete Quiz"
+        message="Are you sure you want to delete this quiz? This action cannot be undone."
+        confirmText="Delete"
+        // confirmButtonClass="bg-red-600 hover:bg-red-700 text-white"
+      />
       {/* <ModalLoading isOpen={isLoading} /> */}
     </div>
   );
