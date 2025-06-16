@@ -412,14 +412,22 @@ export default function QuizCreator() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {quizzes.map((quiz) => (
-              <Link
+              <div
                 key={quiz.id}
-                href={`/dashboard/quiz-creator/${quiz.id}`}
                 className="group relative bg-white rounded-xl border-dashed border-black shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden border-2"
               >
+                {/* Top-right delete button (optional, if you have delete logic) */}
+                {/* <div className="absolute top-0 right-0 mt-4 mr-4 z-10">
+                  <button
+                    onClick={() => handleDeleteClick(quiz.id)}
+                    className="inline-flex items-center justify-center w-8 h-8 rounded-none border-2 border-black text-black hover:bg-gray-100 transition-all disabled:opacity-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div> */}
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-gray-900 group-hover:text-black transition-colors line-clamp-1 flex items-center">
-                    {quiz.title}
+                    {quiz.title.length > 15 ? quiz.title.slice(0, 15) + '...' : quiz.title}
                     <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium bg-gray-100 text-black border border-black">
                       {quiz.total_points} points
                     </span>
@@ -442,8 +450,25 @@ export default function QuizCreator() {
                       {quiz.is_published ? 'Published' : 'Draft'}
                     </span>
                   </div>
+                  {/* Action buttons (Edit, Details, etc.) */}
+                  <div className="mt-6 flex items-center gap-3">
+                    <Link
+                      href={`/dashboard/quiz-creator/${quiz.id}`}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-black text-sm font-medium rounded-lg hover:bg-gray-50 transition-all text-black"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Details
+                    </Link>
+                    <Link
+                      href={`/dashboard/quiz-creator/${quiz.id}/edit`}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-black text-sm font-medium rounded-lg hover:bg-gray-50 transition-all text-black"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </Link>
+                  </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         )}
@@ -451,7 +476,7 @@ export default function QuizCreator() {
 
       {/* Create Quiz Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center z-50 p-4 pt-20">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl border-2 border-black max-w-md w-full p-8 flex flex-col">
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-extrabold text-black">Create New Quiz</h2>
@@ -489,7 +514,7 @@ export default function QuizCreator() {
                   placeholder="Enter quiz description"
                 />
               </div>
-              <div>
+              {/* <div>
                 <label htmlFor="timeLimit" className="block text-sm font-medium text-black mb-1">
                   Time Limit (minutes, optional)
                 </label>
@@ -502,7 +527,7 @@ export default function QuizCreator() {
                   placeholder="Enter time limit"
                   min="0"
                 />
-              </div>
+              </div> */}
               <div className="flex justify-end gap-4 pt-2">
                 <button
                   onClick={() => setShowCreateModal(false)}

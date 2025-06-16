@@ -151,35 +151,35 @@ function QuestionCard({ question, isOverlay = false, userName, isAuthenticated, 
     : question.question
 
   const cardContent = (
-    <div className="flex flex-col h-full justify-between">
+    <div className="flex flex-col h-full justify-between font-oswald">
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 text-sm text-gray-700 mb-1"> {/* Adjusted text color */}
-          <User className="w-5 h-5 flex-shrink-0 text-black" /> {/* Lucide User icon */}
+        <div className="flex items-center gap-1.5 text-sm text-gray-700 mb-1 font-oswald">
+          <User className="w-5 h-5 flex-shrink-0 text-black" />
           <span className="truncate">{question.questioned_by || 'Anonymous'}</span>
         </div>
         <p
           onClick={() => setShowModal(true)}
-          className="break-words text-black cursor-pointer hover:text-gray-800 transition-colors mt-4" /* Adjusted text color and hover */
+          className="break-words text-black cursor-pointer hover:text-gray-800 transition-colors mt-4 font-oswald"
         >
-          {truncatedQuestion} {/* Display full question, modal shows it fully */}
+          {truncatedQuestion}
         </p>
       </div>
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 mt-4 pt-4 border-t-2 border-black border-dashed"> {/* Adjusted border */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 mt-4 pt-4 border-t-2 border-black border-dashed font-oswald">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 flex-shrink-0 text-black" /> {/* Lucide Clock icon */}
+            <Clock className="w-4 h-4 flex-shrink-0 text-black" />
             <span>{timeAgo}</span>
-            <span className="text-black">•</span> {/* Adjusted text color */}
-            <button onClick={() => setShowModal(true)} className="flex items-center gap-1.5 cursor-pointer hover:text-black transition-colors p-1 -m-1 rounded-none"> {/* Adjusted button styling */}
-              <MessageSquare className="w-4 h-4 flex-shrink-0 text-black" /> {/* Lucide MessageSquare icon */}
+            <span className="text-black">•</span>
+            <button onClick={() => setShowModal(true)} className="flex items-center gap-1.5 cursor-pointer hover:text-black transition-colors p-1 -m-1 rounded-xl font-oswald">
+              <MessageSquare className="w-4 h-4 flex-shrink-0 text-black" />
               <span>{question.comments_count || 0}</span>
             </button>
           </div>
           <button
             onClick={handleLikeClick}
-            className={`flex items-center gap-1.5 transition-colors p-1 -m-1 rounded-none ${isLiked ? 'text-black hover:text-gray-800' : 'text-gray-700 hover:text-black'}`} /* Adjusted button styling */
+            className={`flex items-center gap-1.5 transition-colors p-1 -m-1 rounded-xl font-oswald ${isLiked ? 'text-black hover:text-gray-800' : 'text-gray-700 hover:text-black'}`}
           >
-            <Heart fill={isLiked ? "black" : "none"} className="w-4 h-4 flex-shrink-0" /> {/* Lucide Heart icon, fill with black */}
+            <Heart fill={isLiked ? "black" : "none"} className="w-4 h-4 flex-shrink-0" />
             <span>{localLikes}</span>
           </button>
         </div>
@@ -187,89 +187,82 @@ function QuestionCard({ question, isOverlay = false, userName, isAuthenticated, 
     </div>
   );
 
-  if (isOverlay) {
-    return (
-      <div className={clsx(
-        'bg-white p-6 rounded-none shadow-lg border-2 border-black', // Redesigned overlay card
-        isDragging && 'opacity-50'
-      )}>
-        {cardContent}
-      </div>
-    );
-  }
+  // if (isOverlay) {
+  //   return (
+  //     <div className={clsx(
+  //       'bg-white p-6 rounded-xl shadow-lg border-2 border-black font-oswald',
+  //       isDragging && 'opacity-50'
+  //     )}>
+  //       {cardContent}
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
       <div
-        ref={setNodeRef}
-        style={style}
-        className={clsx(
-          'bg-white p-6 rounded-none shadow-md hover:shadow-lg transition-all border-2 border-black relative', // Redesigned main card
-          isDragging && 'opacity-50 border-gray-400 shadow-xl -rotate-1' // Adjusted dragging styles
-        )}
+        // ref={setNodeRef}
+        // style={style}
+        className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg border-2 border-black relative font-oswald"
       >
         <div className="flex items-start justify-between gap-4 h-full">
           <div className="flex-1 min-w-0 h-full">
             {cardContent}
           </div>
         </div>
-
-        {sortOrder !== 'popular' && ( // Only show question number if not sorted by popular
-          <div className="absolute top-0 right-0 -mt-3 -mr-3"> {/* Adjusted positioning */}
-            <div className="bg-gray-100 text-black text-xs font-medium px-2.5 py-1 rounded-none border-2 border-black shadow-sm"> {/* Redesigned badge */}
+        {sortOrder !== 'popular' && (
+          <div className="absolute top-0 right-0 -mt-3 -mr-3">
+            <div className="bg-gray-100 text-black text-xs font-bold px-2.5 py-1 rounded-xl border-2 border-black shadow-sm font-oswald">
               #{question.question_number}
             </div>
           </div>
         )}
       </div>
-
       {/* Question Detail Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-0 sm:p-4">
-          <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-2xl rounded-none sm:w-full overflow-y-auto border-2 border-black shadow-xl"> {/* Redesigned modal container */}
+          <div className="bg-white w-full h-full sm:h-auto sm:max-h-[90vh] sm:max-w-2xl rounded-xl sm:w-full overflow-y-auto border-2 border-black shadow-xl font-oswald">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-white border-b-2 border-black px-4 py-4 sm:px-6 sm:py-4 flex justify-between items-center shadow-sm"> {/* Redesigned header */}
-              <h2 className="text-xl font-semibold text-black">Question Details</h2> {/* Adjusted text color */}
+            <div className="sticky top-0 bg-white border-b-2 border-black px-4 py-4 sm:px-6 sm:py-4 flex justify-between items-center shadow-sm font-oswald">
+              <h2 className="text-xl font-bold text-black font-oswald">Question Details</h2>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-black hover:text-gray-700 transition-colors p-1 -mr-1" /* Adjusted icon color */
+                className="text-black hover:text-gray-700 transition-colors p-1 -mr-1"
               >
-                <X className="w-6 h-6" /> {/* Lucide X */}
+                <X className="w-6 h-6" />
               </button>
             </div>
-
-            <div className="p-4 sm:p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-6 font-oswald">
               {/* Question Info */}
-              <div className="flex items-center gap-1.5 text-sm text-gray-700 mb-2"> {/* Adjusted text color */}
-                <User className="w-5 h-5 flex-shrink-0 text-black" /> {/* Lucide User */}
+              <div className="flex items-center gap-1.5 text-sm text-gray-700 mb-2 font-oswald">
+                <User className="w-5 h-5 flex-shrink-0 text-black" />
                 <span className="truncate">{question.questioned_by || 'Anonymous'}</span>
               </div>
-              <p className="text-lg pb-6 border-b-2 border-black text-black mt-4"> {/* Adjusted border and text color */}
+              <p className="text-lg pb-6 border-b-2 border-black text-black mt-4 font-oswald">
                 {question.question}
               </p>
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 mt-4"> {/* Adjusted text color */}
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-700 mt-4 font-oswald">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 flex-shrink-0 text-black" /> {/* Lucide Clock */}
+                    <Clock className="w-4 h-4 flex-shrink-0 text-black" />
                     <span>{timeAgo}</span>
-                    <span className="text-black">•</span> {/* Adjusted text color */}
-                    <div onClick={() => setIsCommentsOpen(!isCommentsOpen)} className="flex items-center gap-1.5 cursor-pointer hover:text-black transition-colors"> {/* Adjusted button styling */}
-                      <MessageSquare className="w-4 h-4 flex-shrink-0 text-black" /> {/* Lucide MessageSquare */}
+                    <span className="text-black">•</span>
+                    <div onClick={() => setIsCommentsOpen(!isCommentsOpen)} className="flex items-center gap-1.5 cursor-pointer hover:text-black transition-colors font-oswald">
+                      <MessageSquare className="w-4 h-4 flex-shrink-0 text-black" />
                       <span>{question.comments_count || 0}</span>
                     </div>
                   </div>
                   <button
                     onClick={handleLikeClick}
-                    className={`flex items-center gap-1.5 transition-colors p-1 -m-1 rounded-none ${isLiked ? 'text-black hover:text-gray-800' : 'text-gray-700 hover:text-black'}`} /* Adjusted button styling */
+                    className={`flex items-center gap-1.5 transition-colors p-1 -m-1 rounded-xl font-oswald ${isLiked ? 'text-black hover:text-gray-800' : 'text-gray-700 hover:text-black'}`}
                   >
-                    <Heart fill={isLiked ? "black" : "none"} className="w-4 h-4 flex-shrink-0" /> {/* Lucide Heart */}
+                    <Heart fill={isLiked ? "black" : "none"} className="w-4 h-4 flex-shrink-0" />
                     <span>{localLikes}</span>
                   </button>
                 </div>
               </div>
-
               {/* Comments Section */}
-              <div className="mt-6">
+              <div className="mt-6 font-oswald">
                 <CommentSection questionId={question.id} userName={userName} />
               </div>
             </div>

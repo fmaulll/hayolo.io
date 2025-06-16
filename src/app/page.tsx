@@ -53,7 +53,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation Header */}
-      <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b-2 border-black shadow-sm">
+      <header className="fixed w-full top-0 z-50 bg-[#FFD34E] backdrop-blur-md border-b-2 border-black shadow-sm">
         <nav className="mx-auto max-w-7xl px-6 lg:px-8" aria-label="Global">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="text-2xl font-extrabold text-black flex items-center gap-2 font-oswald hover:text-gray-800 transition-colors">
@@ -109,7 +109,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="rounded-lg bg-[#FFD34E] px-4 py-2 text-lg font-medium text-black shadow-sm hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-all border-2 border-black"
+                  className="rounded-lg bg-white px-4 py-2 text-lg font-medium text-black shadow-sm hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black transition-all border-2 border-black"
                 >
                   Get Started
                 </Link>
@@ -222,7 +222,7 @@ export default function Home() {
                   </Link>
                   <Link
                     href="/about"
-                    className="w-full sm:w-auto text-lg font-bold text-black hover:text-gray-800 transition-colors flex items-center justify-center gap-2 border-2 border-black px-6 py-3 rounded-lg font-oswald"
+                    className="w-full sm:w-auto text-lg font-bold text-black hover:bg-gray-200 hover:text-gray-800 transition-colors flex items-center justify-center gap-2 border-2 border-black px-6 py-3 rounded-lg font-oswald"
                   >
                     Watch Demo
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-black">
@@ -270,7 +270,7 @@ export default function Home() {
         </div>
 
         {/* Features Section */}
-        <div className="py-24 sm:py-32 bg-white">
+        <div className="pb-24 sm:pb-32 bg-white">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto max-w-2xl lg:text-center">
               <h2 className="text-base font-bold leading-7 text-black font-oswald">Perfect for Education</h2>
@@ -333,15 +333,15 @@ export default function Home() {
         <div className="relative isolate overflow-hidden bg-[#0D006E] py-16 sm:py-24 lg:py-32 border-t-2 border-b-2 border-black">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-2">
-              <div className="max-w-xl lg:max-w-lg p-4 border-2 rounded-md border-black bg-white">
-                <h2 className="text-3xl font-extrabold tracking-tight text-black sm:text-4xl font-oswald">Ready to transform your classroom?</h2>
-                <p className="mt-4 text-lg leading-8 text-gray-800 font-oswald">
+              <div className="max-w-xl lg:max-w-lg p-4 rounded-md">
+                <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl font-oswald">Ready to transform your classroom?</h2>
+                <p className="mt-4 text-lg leading-8 text-white font-oswald">
                   Join thousands of educators who are making their classes more interactive and engaging with QuestionBoard.
                 </p>
                 <div className="mt-6 flex max-w-md gap-x-4">
                   <Link
                     href="/dashboard"
-                    className="rounded-lg bg-[#412CE1] px-6 py-3 text-lg font-bold text-white shadow-md hover:bg-[#0D006E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-all duration-300 border-2 border-black font-oswald"
+                    className="rounded-lg bg-[#FFD34E] px-6 py-3 text-lg font-bold text-black shadow-md hover:bg-yellow-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition-all duration-300 border-2 border-black font-oswald"
                   >
                     Get Started Free
                   </Link>

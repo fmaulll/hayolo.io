@@ -5,7 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Trash2, Edit, Eye, MessageSquare, X, Play, Square } from 'lucide-react'; // Added Lucide icons for consistency
+import { Plus, Trash2, Edit, Eye, MessageSquare, X, Play, Square, Presentation } from 'lucide-react'; // Added Lucide icons for consistency
 import toast from 'react-hot-toast';
 import ModalLoading from '@/app/components/ModalLoading';
 import ConfirmationModal from '@/components/ConfirmationModal';
@@ -365,6 +365,7 @@ export default function AnonymousQuestion() {
 
                   <div className="mt-6 flex items-center gap-3">
                     {board.session_status === 'in_progress' ? (
+                      <>
                       <button
                         onClick={() => handleStopSession(board)}
                         className="inline-flex items-center justify-center w-10 h-10 rounded-full !p-0 flex-none
@@ -372,6 +373,15 @@ export default function AnonymousQuestion() {
                       >
                         <Square className="w-4 h-4" />
                       </button>
+                      <Link
+                        href={`/questions/${board.id}/${board.session_code}`}
+                        target="_blank"
+                        className="inline-flex items-center justify-center w-10 h-10 rounded-full !p-0 flex-none
+                                    bg-black text-white hover:bg-gray-800 transition-colors shadow-sm"
+                      >
+                        <Presentation className="w-4 h-4" />
+                      </Link>
+                      </>
                     ) : (
                       <button
                         onClick={() => handlePresentBoard(board)}

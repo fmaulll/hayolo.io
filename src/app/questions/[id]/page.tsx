@@ -258,23 +258,20 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b-2 border-black shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      <header className="bg-[#FFD34E] shadow-md border-b-2 border-black">
+        <div className="max-w-7xl mx-auto px-8 py-4 flex items-center">
+          <div className="flex items-center gap-4 mb-4 md:mb-0 w-full justify-between">
             <Link
-              href="/dashboard"
-              className="flex items-center gap-2 text-black font-bold text-xl hover:text-gray-800 transition-colors"
+              href="/" 
+              className="text-2xl font-extrabold text-black tracking-tight"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-              </svg>
-              QuestionBoard
+              hayolo.io
             </Link>
 
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowQRModal(true)}
-                className="inline-flex items-center gap-2 text-black hover:text-gray-800 transition-colors"
+                className="inline-flex items-center gap-2 text-black hover:text-gray-800 transition-colors rounded-full border-2 border-black px-4 py-2 bg-white"
               >
                 <LinkIcon className="w-5 h-5" />
                 Share
@@ -305,7 +302,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
               <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto mt-4 sm:mt-0">
                 {/* "Participating as" section - now always first in vertical order for mobile */}
                 {!isAuthenticated && (
-                  <div className="order-1 sm:order-none p-4 border-2 border-black border-dashed rounded-none flex flex-col sm:flex-row items-center gap-2 text-sm bg-gray-50 shadow-sm w-full">
+                  <div className="order-1 sm:order-none p-4 border-2 border-black border-dashed rounded-lg flex flex-col sm:flex-row items-center gap-2 text-sm bg-gray-50 shadow-sm w-full">
                     <span className="text-gray-700">Participating as:</span>
                     <button
                       onClick={handleUpdateName}
@@ -324,7 +321,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
                 )}>
                     {!isAuthenticated && <button
                       onClick={() => setShowAddModal(true)}
-                      className="inline-flex justify-center items-center gap-2 bg-black text-white px-4 py-2 rounded-none font-medium hover:bg-gray-800 transition-all shadow-md border border-black w-full"
+                      className="inline-flex justify-center items-center gap-2 bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-all shadow-md border border-black w-full"
                     >
                       <Plus className="w-5 h-5" />
                       Question
@@ -338,7 +335,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
                         };
                         setSortOrder(nextOrder[sortOrder]);
                       }}
-                      className="inline-flex justify-center items-center gap-2 bg-white text-black px-4 py-2 rounded-none font-medium hover:bg-gray-100 transition-all shadow-md border-2 border-black w-full"
+                      className="inline-flex justify-center items-center gap-2 bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-all shadow-md border-2 border-black w-full"
                     >
                       {sortOrder === 'popular' ? <Star className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
                       {sortOrder === 'newest' ? 'Newest' : sortOrder === 'oldest' ? 'Oldest' : 'Popular'}
@@ -349,48 +346,50 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
             
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-            {questions.map((question) => (
-              <div
-                key={question.id}
-                className={clsx(
-                  'transition-all duration-300',
-                  newQuestionIds.has(question.id) && 'animate-[pop-in_0.3s_ease-out]'
-                )}
-              >
-                <QuestionCard
-                  question={question}
-                  index={question.order}
-                  userName={userName || 'Anonymous'}
-                  isAuthenticated={isAuthenticated}
-                  sortOrder={sortOrder}
-                />
-              </div>
-            ))}
-          </div>
-
-          {questions.length === 0 && (
-            <div className="text-center py-12 bg-white rounded-none border-2 border-black shadow-lg">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-none bg-gray-100 mb-4 border border-black">
+          {questions.length === 0 ? (
+            <div className="relative text-center py-12 bg-[#FFD34E] rounded-none border-2 border-black shadow-lg rounded-xl mt-8">
+              <div className="absolute bg-white top-[-32px] left-[32px] rounded-lg px-4 py-2 border-2 border-black text-black font-bold text-2xl font-oswald">Questions</div>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-none bg-gray-100 mb-4 border-2 border-black rounded-xl">
                 <MessageSquare className="w-8 h-8 text-black" />
               </div>
               <h3 className="text-lg font-semibold text-black mb-2">No questions yet</h3>
               <p className="text-gray-700 mb-6">Start by adding your first question</p>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="inline-flex items-center gap-2 bg-black text-white px-6 py-3 rounded-none font-medium hover:bg-gray-800 transition-all shadow-md border border-black"
+                className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-none font-medium hover:bg-gray-200 transition-all shadow-md border-2 border-black rounded-xl"
               >
                 <Plus className="w-5 h-5" />
                 Add Your First Question
               </button>
             </div>
-          )}
+          ) : 
+          (
+            <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 bg-[#FFD34E] rounded-lg shadow-xl border-2 border-black p-8">
+              <div className="absolute bg-white top-[-32px] left-[32px] rounded-lg px-4 py-2 border-2 border-black text-black font-bold text-2xl font-oswald">Questions</div>
+              {questions.map((question) => (
+                <div
+                  key={question.id}
+                  className={clsx(
+                    'transition-all duration-300',
+                    newQuestionIds.has(question.id) && 'animate-[pop-in_0.3s_ease-out]'
+                  )}
+                >
+                  <QuestionCard
+                    question={question}
+                    index={question.order}
+                    userName={userName || 'Anonymous'}
+                    isAuthenticated={isAuthenticated}
+                    sortOrder={sortOrder}
+                  />
+                </div>
+              ))}
+            </div>)}
         </div>
 
         {/* QR Code Modal */}
         {showQRModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white p-8 rounded-none shadow-xl max-w-md w-full border-2 border-black">
+            <div className="bg-white p-8 rounded-none shadow-xl max-w-md w-full border-2 border-black rounded-xl">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-black">Share Board</h2>
                 <button
@@ -401,7 +400,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
                 </button>
               </div>
               
-              <div className="bg-gray-100 p-6 rounded-none border-2 border-black flex items-center justify-center mb-6">
+              <div className="bg-gray-100 p-6 rounded-none border-2 border-black flex items-center justify-center mb-6 rounded-xl">
                 <QRCodeSVG
                   value={boardUrl}
                   size={Math.min(200, window.innerWidth - 80)}
@@ -414,7 +413,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
                 <label className="block text-sm font-medium text-black mb-2">
                   Board URL
                 </label>
-                <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-none border-2 border-black">
+                <div className="flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-none border-2 border-black rounded-xl">
                   <input
                     type="text"
                     readOnly
@@ -439,7 +438,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
         {/* Add Question Modal */}
         {showAddModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white p-6 rounded-none shadow-xl max-w-md w-full border-2 border-black">
+            <div className="bg-white p-6 rounded-xl shadow-xl max-w-md w-full border-2 border-black">
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-black">Add Question</h2>
                 <button
@@ -460,7 +459,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
                     value={newQuestion}
                     onChange={(e) => setNewQuestion(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-2 bg-white border-2 border-black rounded-none text-black focus:outline-none focus:ring-0 focus:border-black transition-all"
+                    className="w-full px-4 py-2 bg-white border-2 border-black rounded-xl text-black focus:outline-none focus:ring-0 focus:border-black transition-all"
                     placeholder="Enter your question"
                     disabled={isSubmitting}
                   />
@@ -475,7 +474,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     onClick={() => setShowAddModal(false)}
-                    className="px-4 py-2 text-black hover:text-gray-700 transition-colors rounded-none border-2 border-transparent hover:border-black"
+                    className="px-4 py-2 text-black hover:text-gray-700 transition-colors rounded-xl border-2 border-transparent hover:border-black"
                     disabled={isSubmitting}
                   >
                     Cancel
@@ -483,7 +482,7 @@ export default function QuestionsPage({ params }: { params: { id: string, code: 
                   <button
                     onClick={handleAddQuestion}
                     disabled={isSubmitting || !(newQuestion?.trim())}
-                    className="bg-black text-white px-4 py-2 rounded-none hover:bg-gray-800 transition-all shadow-md font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 border border-black"
+                    className="bg-black text-white px-4 py-2 rounded-xl hover:bg-gray-800 transition-all shadow-md font-bold border-2 border-black cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
