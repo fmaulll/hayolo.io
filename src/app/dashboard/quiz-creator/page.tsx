@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { useRouter } from 'next/navigation';
-import { Plus, Trash2, Edit, Save, Image as ImageIcon, ArrowUp, ArrowDown, Eye, X } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, Image as ImageIcon, ArrowUp, ArrowDown, Eye, X, Play } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import ModalLoading from '@/app/components/ModalLoading';
 import ConfirmationModal from '@/components/ConfirmationModal';
@@ -386,6 +386,27 @@ export default function QuizCreator() {
     }
   };
 
+  const handlePlayQuiz = async (quizId: string) => {
+    try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data, error } = await supabase
+      .from('present_sessions')
+      .insert([{ session_type: 'quiz', content_id: quizId, user_id: user.id, status: 'waiting' }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    // router.push(`/waiting-room/host/${data.id}/${data.code}`);
+    window.open(`/waiting-room/host/${data.content_id}/${data.code}`, '_blank')
+    } catch (error) {
+      console.error('Error playing quiz:', error);
+      toast.error('Failed to play quiz');
+    }
+  };
+
 //   if (isLoading) {
 //     return (
 //         <div className="min-h-screen flex items-center justify-center">
@@ -466,14 +487,14 @@ export default function QuizCreator() {
                     {quiz.description}
                   </p>
                   <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
-                    {quiz.time_limit && (
+                    {/* {quiz.time_limit && (
                       <span className="inline-flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         {quiz.time_limit} min
                       </span>
-                    )}
+                    )} */}
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-none text-xs font-medium ${
                       quiz.is_published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                     } border border-black`}>
@@ -482,6 +503,10 @@ export default function QuizCreator() {
                   </div>
                   {/* Action buttons (Edit, Details, etc.) */}
                   <div className="mt-6 flex items-center gap-3">
+                    <button onClick={() => handlePlayQuiz(quiz.id)} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-black text-sm font-medium rounded-lg hover:bg-gray-50 transition-all text-black">
+                      <Play className="w-4 h-4" />
+                      Play Quiz
+                    </button>
                     <Link
                       href={`/dashboard/quiz-creator/${quiz.id}`}
                       className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-black text-sm font-medium rounded-lg hover:bg-gray-50 transition-all text-black"

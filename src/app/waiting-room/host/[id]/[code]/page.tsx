@@ -17,6 +17,7 @@ interface PresentSession {
   status: 'waiting' | 'in_progress' | 'completed';
   start_time: string | null;
   code: string;
+  session_type: 'crossword' | 'quiz';
 }
 
 interface PlayerSession {
@@ -247,7 +248,24 @@ export default function WaitingRoomHost({ params }: { params: { id: string; code
 
       if (updateError) throw updateError;
 
-      router.push(`/${sessionData.session_type}/${params.id}/${params.code}`); 
+      if (sessionData.session_type === 'quiz') {
+        const { error: insertError } = await supabase
+          .from('quiz_sessions')
+          .insert({
+            code: params.code,
+            quiz_id: params.id,
+            host_id: sessionData.user_id,
+            current_question_index: 0,
+            status: 'in_progress',
+            start_time: new Date().toISOString(),
+          })
+        if (insertError) throw insertError;
+      }
+      if (sessionData.session_type === 'quiz') {
+        router.push(`/${sessionData.session_type}/host/${params.id}/${params.code}`)
+      } else {
+        router.push(`/${sessionData.session_type}/${params.id}/${params.code}`); 
+      }
     } catch (error) {
       console.error('Error starting game:', error);
       toast.error('Failed to start game');
@@ -312,6 +330,9 @@ export default function WaitingRoomHost({ params }: { params: { id: string; code
                     <p className="text-gray-700 mt-2">
                       Status: <span className="font-semibold text-black">{session?.status === 'in_progress' ? 'Game in Progress' : 'Waiting for Players'}</span>
                     </p>
+                    <p className="text-gray-700 mt-2">
+                      {session?.session_type}
+                      </p>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-black text-lg">

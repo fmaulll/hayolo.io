@@ -135,13 +135,24 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
           table: 'present_sessions',
           filter: `id=eq.${sessionId}`
         },
-        (payload) => {
+        async (payload) => {
           if (payload.new) {
             const newSession = payload.new as CrosswordSession;
             setSession(newSession);
             
             // Redirect to game when it starts
             if (newSession.status === 'in_progress') {
+              if (newSession.session_type === 'quiz') {
+                const { error: quizParticipantError } = await supabase
+                  .from('quiz_participants')
+                  .insert({
+                    session_id: newSession.id,
+                    player_session_id: playerSessionId,
+                    nickname: nickname,
+                    score: 0,
+                  })
+                if (quizParticipantError) throw quizParticipantError;
+              }
               router.push(`/${newSession.session_type}/${params.id}/${params.code}`);
             }
           }

@@ -624,7 +624,7 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
                   rows={3}
                 />
               </div>
-              <div>
+              {/* <div>
                 <label htmlFor="timeLimit" className="block text-sm font-medium text-black mb-1">
                   Time Limit (minutes)
                 </label>
@@ -637,7 +637,7 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
                   placeholder="0 (no limit)"
                   min="0"
                 />
-              </div>
+              </div> */}
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleUpdateQuizDetails}
@@ -679,11 +679,11 @@ export default function EditQuiz({ params }: { params: { id: string } }) {
                   <p className="text-gray-600 mt-1">{quiz.description || 'No description provided'}</p>
                   <div className="flex items-center gap-4 mt-2">
                     <span className="text-sm text-gray-600">{quiz.total_points || 0} total points</span>
-                    {quiz.time_limit ? (
+                    {/* {quiz.time_limit ? (
                       <span className="text-sm text-gray-600">{quiz.time_limit} minutes</span>
                     ) : (
                       <span className="text-sm text-gray-600">No time limit</span>
-                    )}
+                    )} */}
                     <span className="px-2.5 py-0.5 rounded-none text-xs font-medium bg-gray-100 text-black border border-black">
                       {quiz.is_published ? 'Published' : 'Draft'}
                     </span>
