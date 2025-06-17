@@ -6,10 +6,12 @@ import { useEffect, useState } from 'react';
 import { Home } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ModalLoading from '@/app/components/ModalLoading';
+import Link from 'next/link';
 
 interface CrosswordSession {
   id: string;
   content_id: string;
+  session_type: string;
   status: 'waiting' | 'in_progress' | 'completed';
   start_time: string | null;
   code: string;
@@ -43,7 +45,7 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
     const fetchInitialData = async () => {
       try {
         // Check local storage for existing session
-        const storedSession = localStorage.getItem(`crossword_player_${params.code}`);
+        const storedSession = localStorage.getItem(`player_${params.code}`);
         if (storedSession) {
           const { sessionId: storedSessionId, playerSessionId: storedPlayerSessionId, nickname: storedNickname } = JSON.parse(storedSession);
           
@@ -70,11 +72,11 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
               setSession(sessionData);
             } else {
               // Clear invalid session from local storage
-              localStorage.removeItem(`crossword_player_${params.code}`);
+              localStorage.removeItem(`player_${params.code}`);
             }
           } else {
             // Clear invalid session from local storage
-            localStorage.removeItem(`crossword_player_${params.code}`);
+            localStorage.removeItem(`player_${params.code}`);
           }
         }
 
@@ -140,7 +142,7 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
             
             // Redirect to game when it starts
             if (newSession.status === 'in_progress') {
-              router.push(`/crossword/${params.id}/${params.code}`);
+              router.push(`/${newSession.session_type}/${params.id}/${params.code}`);
             }
           }
         }
@@ -167,7 +169,7 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
           } else if (payload.eventType === 'DELETE') {
             // If the deleted player is the current player, show nickname input
             if (payload.old.id === playerSessionId) {
-              localStorage.removeItem(`crossword_player_${params.code}`);
+              localStorage.removeItem(`player_${params.code}`);
               setShowNicknameInput(true);
               setPlayerSessionId(null);
               toast.error('You have been removed from the game');
@@ -215,7 +217,7 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
 
       if (playerSession) {
         // Store session info in local storage
-        localStorage.setItem(`crossword_player_${params.code}`, JSON.stringify({
+        localStorage.setItem(`player_${params.code}`, JSON.stringify({
           sessionId: newSession,
           playerSessionId: playerSession.id,
           nickname
@@ -243,8 +245,11 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
 
   if (showNicknameInput) {
     return (
-      <div className="min-h-screen bg-white bg-[url('/background-seamless.png')] bg-repeat flex items-center justify-center p-4 md:p-8">
-        <div className="max-w-md w-full bg-white p-8 rounded-none shadow-lg border-2 border-black">
+      <div className="min-h-screen bg-white bg-[url('/Background.svg')] bg-repeat flex flex-col items-center justify-center p-4 md:p-8">
+        <Link href="/" className="text-4xl font-bold text-black mb-4 hover:text-gray-700 transition-all">
+          hayolo.io
+        </Link>
+        <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border-2 border-black">
           <h2 className="text-2xl font-bold mb-6 text-black">Join Crossword Game</h2>
           <div className="space-y-4">
             <div>
@@ -263,13 +268,13 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
             </div>
             <button
               onClick={handleJoinGame}
-              className="w-full py-2 px-4 border-2 border-black rounded-none shadow-md text-sm font-medium text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-0"
+              className="w-full py-2 px-4 rounded-lg border-2 border-black shadow-md text-sm font-medium text-black bg-[#FFD34E] hover:bg-yellow-500 focus:outline-none focus:ring-0"
             >
               Join Game
             </button>
             <button
                 onClick={() => router.replace('/')}
-                className="w-full py-2 px-4 border-2 border-black rounded-none shadow-sm text-sm font-medium text-black hover:bg-gray-100 focus:outline-none focus:ring-0"
+                className="w-full py-2 px-4 border-2 border-black rounded-lg shadow-sm text-sm font-medium text-black hover:bg-gray-100 focus:outline-none focus:ring-0"
             >
                 Go Home
             </button>
@@ -280,8 +285,11 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
   }
 
   return (
-    <div className="min-h-screen bg-white bg-[url('/background-seamless.png')] bg-repeat flex items-center justify-center p-4 md:p-8">
-      <div className="max-w-md w-full bg-white p-8 rounded-none shadow-lg border-2 border-black">
+    <div className="min-h-screen bg-white bg-[url('/Background.svg')] bg-repeat flex flex-col items-center justify-center p-4 md:p-8">
+      <Link href="/" className="text-4xl font-bold text-black mb-4 hover:text-gray-700 transition-all">
+        hayolo.io
+      </Link>
+      <div className="max-w-md w-full bg-white p-8 rounded-xl shadow-lg border-2 border-black">
         <h2 className="text-2xl font-bold mb-6 text-black">Waiting Room</h2>
         <p className="text-gray-700 text-center mb-4">
             Game Code: <span className="font-extrabold text-black text-xl">{params.code}</span>
@@ -291,14 +299,14 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
             <h3 className="text-lg font-medium text-black mb-4">Players</h3>
             <div className="space-y-2">
               {players.length === 0 && (
-                  <p className="text-gray-700 text-center py-4 border-2 border-dashed border-black rounded-none">
+                  <p className="text-gray-700 text-center py-4 border-2 border-dashed border-black rounded-lg">
                       No players yet.
                   </p>
               )}
               {players.map((player) => (
                 <div
                   key={player.id}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-none border-2 border-black shadow-sm"
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border-2 border-black shadow-sm"
                 >
                   <span className="font-medium text-black">
                     {player.nickname}
@@ -309,14 +317,14 @@ export default function WaitingRoomPlayPage({ params }: { params: { id: string; 
                     )}
                   </span>
                   {player.id === playerSessionId && (
-                      <span className="text-xs bg-gray-100 text-black px-2 py-1 rounded-none border-2 border-black">You</span>
+                      <span className="text-xs bg-[#FFD34E] text-black px-2 py-1 rounded-md border-2 border-black">You</span>
                   )}
                 </div>
               ))}
             </div>
           </div>
           
-          <div className="text-center text-gray-700 border-2 border-dashed border-black p-4 rounded-none">
+          <div className="text-center text-gray-700 border-2 border-dashed border-black p-4 rounded-lg">
             Waiting for the host to start the game...
           </div>
         </div>

@@ -303,8 +303,8 @@ export default function CrosswordGamePage({ params }: { params: { id: string; co
     const validateSession = async () => {
       try {
         // Check both host and player storage
-        const hostStoredSession = localStorage.getItem(`crossword_host_${params.code}`);
-        const playerStoredSession = localStorage.getItem(`crossword_player_${params.code}`);
+        const hostStoredSession = localStorage.getItem(`host_${params.code}`);
+        const playerStoredSession = localStorage.getItem(`player_${params.code}`);
 
         if (!hostStoredSession && !playerStoredSession) {
           router.replace('/');
@@ -359,7 +359,7 @@ export default function CrosswordGamePage({ params }: { params: { id: string; co
         setPlayerSession(playerSessionData);
 
         // Store the current player session info for progress tracking
-        localStorage.setItem(`crossword_current_player_session_${params.id}`, JSON.stringify({
+        localStorage.setItem(`crossword_current_player_session_${params.code}`, JSON.stringify({
           sessionId: sessionData.id,
           playerSessionId: playerSessionData.id,
           nickname: playerSessionData.nickname
@@ -419,7 +419,7 @@ export default function CrosswordGamePage({ params }: { params: { id: string; co
         if (savedProgress) {
           const parsedProgress = JSON.parse(savedProgress);
           // Check if the saved session ID matches the current one
-          const currentSessionInfo = JSON.parse(localStorage.getItem(`crossword_current_player_session_${params.id}`) || '{}');
+          const currentSessionInfo = JSON.parse(localStorage.getItem(`crossword_current_player_session_${params.code}`) || '{}');
           if (parsedProgress.sessionId === currentSessionInfo.sessionId && parsedProgress.playerSessionId === currentSessionInfo.playerSessionId) {
             initialUserGrid = parsedProgress.userGrid || initialUserGrid;
             initialCompletedWords = new Set(parsedProgress.completedWords || []);

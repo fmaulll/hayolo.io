@@ -684,7 +684,9 @@ export default function CreateCrosswordPage() {
 
       toast.success('Puzzle created successfully!');
 
-      router.push(`/waiting-room/host/${crossword.id}/${newSession[0].session_code}`);
+      fetchCrosswords();
+      // router.push(`/waiting-room/host/${crossword.id}/${newSession[0].session_code}`);
+      window.open(`/waiting-room/host/${crossword.id}/${newSession[0].session_code}`, '_blank', 'noopener,noreferrer')
     } catch (error) {
       console.error('Error joining present session:', error);
     } finally {
