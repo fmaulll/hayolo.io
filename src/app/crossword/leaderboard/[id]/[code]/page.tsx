@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Trophy, Medal, Home, Share } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import ModalLoading from '@/app/components/ModalLoading';
 
 interface PlayerStats {
   nickname: string;
@@ -38,10 +39,16 @@ export default function LeaderboardPage({ params }: { params: { id: string; code
   const [leaderboardData, setLeaderboardData] = useState<PlayerStats[]>([]);
   const [sessionData, setSessionData] = useState<CrosswordSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setIsAuthenticated(true);
+        }
+
         // First verify if the session exists and is completed
         const { data: session, error: sessionError } = await supabase
           .from('present_sessions')
@@ -130,17 +137,6 @@ export default function LeaderboardPage({ params }: { params: { id: string; code
     fetchLeaderboard();
   }, [params.id, params.code, router, supabase]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-none h-8 w-8 border-2 border-black mx-auto"></div>
-          <p className="mt-4 text-black">Loading leaderboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
@@ -155,112 +151,120 @@ export default function LeaderboardPage({ params }: { params: { id: string; code
   };
 
   return (
-    <div className="min-h-screen bg-white p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-none shadow-lg p-6 mb-6 border border-black">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-black">Final Results</h1>
-              <p className="text-gray-700 mt-2">
-                Game Code: <span className="font-semibold text-black">{params.code}</span>
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3"> {/* Use flex-wrap for mobile responsiveness */}
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center px-4 py-2 bg-white border border-black rounded-none text-black hover:bg-gray-100 transition-colors duration-200 shadow-sm"
-              >
-                <Home className="h-4 w-4 mr-2" />
-                Dashboard
-              </Link>
-              <button
-                onClick={() => {
-                  const url = window.location.href;
-                  navigator.clipboard.writeText(url);
-                  toast.success('Link copied to clipboard');
-                }}
-                className="inline-flex items-center px-4 py-2 bg-white border border-black rounded-none text-black hover:bg-gray-100 transition-colors duration-200 shadow-sm"
-              >
-                <Share className="h-4 w-4 mr-2" />
-                Share
-              </button>
+    <>
+        <div className="min-h-screen bg-white bg-[url('/Background.svg')] bg-repeat p-4 md:p-8 flex flex-col items-center justify-center">
+        <Link href="/" className="text-4xl font-bold text-black mb-4 hover:text-gray-700 transition-all">
+          hayolo.io
+        </Link>
+        <div className="w-full max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6 border-2 border-black">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-black">Final Results</h1>
+                <p className="text-gray-700 mt-2">
+                  Game Code: <span className="font-semibold text-black">{params.code}</span>
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3"> {/* Use flex-wrap for mobile responsiveness */}
+                {isAuthenticated && (
+                <Link
+                  href="/dashboard"
+                  className="inline-flex items-center px-4 py-2 bg-white border-2 border-black rounded-lg text-black hover:bg-gray-100 transition-colors duration-200 shadow-sm"
+                >
+                  <Home className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Link>
+                )}
+                <button
+                  onClick={() => {
+                    const url = window.location.href;
+                    navigator.clipboard.writeText(url);
+                    toast.success('Link copied to clipboard');
+                  }}
+                  className="inline-flex items-center px-4 py-2 bg-white border-2 border-black rounded-lg text-black hover:bg-gray-100 transition-colors duration-200 shadow-sm"
+                >
+                  <Share className="h-4 w-4 mr-2" />
+                  Share
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Leaderboard */}
-        <div className="bg-white rounded-none shadow-lg p-6 border border-black">
-          <div className="space-y-4">
-            {leaderboardData.map((player) => (
-              <div
-                key={player.nickname}
-                className={`p-4 rounded-none border border-black shadow-sm ${
-                  player.rank === 1
-                    ? 'bg-gray-100' // Subtle highlight for 1st
-                    : player.rank === 2
-                    ? 'bg-gray-50' // Subtle highlight for 2nd
-                    : player.rank === 3
-                    ? 'bg-gray-50' // Subtle highlight for 3rd
-                    : 'bg-white'
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> {/* Flex-col for mobile */}
-                  <div className="flex items-center gap-4">
-                    <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center font-bold text-black
-                      border border-black
-                      ${player.rank === 1
-                        ? 'bg-gray-200' // Darker gray for 1st rank circle background
-                        : player.rank === 2
-                        ? 'bg-gray-100'
-                        : player.rank === 3
-                        ? 'bg-gray-100'
-                        : 'bg-white'
-                      }
-                    `}>
-                      {getRankIcon(player.rank) || `#${player.rank}`}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-black">{player.nickname}</h3>
-                      <div className="flex flex-wrap items-center gap-x-2 mt-1"> {/* Flex-wrap for mobile */}
-                        <span className="text-sm text-gray-700">
-                          {player.completedWords} words completed
-                        </span>
-                        {player.completionTime && (
-                          <>
-                            <span className="text-gray-400">•</span>
-                            <span className="text-sm text-gray-700">
-                              Finished at {new Date(player.completionTime).toLocaleTimeString()}
-                            </span>
-                          </>
-                        )}
+          {/* Leaderboard */}
+          <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-black">
+            <div className="space-y-4">
+              {leaderboardData.map((player) => (
+                <div
+                  key={player.nickname}
+                  className={`p-4 rounded-xl border-2 border-black shadow-sm ${
+                    player.rank === 1
+                      ? 'bg-gray-100' // Subtle highlight for 1st
+                      : player.rank === 2
+                      ? 'bg-gray-50' // Subtle highlight for 2nd
+                      : player.rank === 3
+                      ? 'bg-gray-50' // Subtle highlight for 3rd
+                      : 'bg-white'
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"> {/* Flex-col for mobile */}
+                    <div className="flex items-center gap-4">
+                      <div className={`
+                        w-10 h-10 rounded-full flex items-center justify-center font-bold text-black
+                        border border-black
+                        ${player.rank === 1
+                          ? 'bg-gray-200' // Darker gray for 1st rank circle background
+                          : player.rank === 2
+                          ? 'bg-gray-100'
+                          : player.rank === 3
+                          ? 'bg-gray-100'
+                          : 'bg-white'
+                        }
+                      `}>
+                        {getRankIcon(player.rank) || `#${player.rank}`}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-black">{player.nickname}</h3>
+                        <div className="flex flex-wrap items-center gap-x-2 mt-1"> {/* Flex-wrap for mobile */}
+                          <span className="text-sm text-gray-700">
+                            {player.completedWords} words completed
+                          </span>
+                          {player.completionTime && (
+                            <>
+                              <span className="text-gray-400">•</span>
+                              <span className="text-sm text-gray-700">
+                                Finished at {new Date(player.completionTime).toLocaleTimeString()}
+                              </span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
+                    {player.rank <= 3 && (
+                      <div className="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0"> {/* Text align adjusted for mobile */}
+                        <div className="text-sm font-medium text-black">
+                          {player.rank === 1 ? '🥇 Top Solver' : player.rank === 2 ? '🥈 Second Place' : '🥉 Third Place'}
+                        </div>
+                        <p className="text-xs text-gray-700">
+                          {player.rank === 1 ? 'The fastest!' : player.rank === 2 ? 'Almost there!' : 'Great effort!'}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  {player.rank <= 3 && (
-                    <div className="text-left sm:text-right w-full sm:w-auto mt-2 sm:mt-0"> {/* Text align adjusted for mobile */}
-                      <div className="text-sm font-medium text-black">
-                        {player.rank === 1 ? '🥇 Top Solver' : player.rank === 2 ? '🥈 Second Place' : '🥉 Third Place'}
-                      </div>
-                      <p className="text-xs text-gray-700">
-                        {player.rank === 1 ? 'The fastest!' : player.rank === 2 ? 'Almost there!' : 'Great effort!'}
-                      </p>
-                    </div>
-                  )}
                 </div>
-              </div>
-            ))}
+              ))}
 
-            {leaderboardData.length === 0 && (
-              <div className="text-center py-8 bg-gray-50 rounded-none border border-black border-dashed shadow-sm">
-                <p className="text-gray-700">No players found</p>
-                <p className="text-gray-700 text-sm mt-2">Make sure the game session was completed!</p>
-              </div>
-            )}
+              {leaderboardData.length === 0 && (
+                <div className="text-center py-8 bg-gray-50 rounded-xl border-2 border-black border-dashed shadow-sm">
+                  <p className="text-gray-700">No players found</p>
+                  <p className="text-gray-700 text-sm mt-2">Make sure the game session was completed!</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <ModalLoading isOpen={isLoading} />
+    </>
   );
 }
